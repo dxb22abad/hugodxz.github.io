@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tls on 学渣的世界</title>
+    <link>http://dxz.plus/tags/tls/</link>
+    <description>Recent content in tls on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Sat, 30 Nov 2019 11:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/tls/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>docker v2ray ss  emby  CDN 自选 cloudflare 节点 简单教程 &#43; trojan 特洛伊</title>
+        <link>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</link>
+        <pubDate>Sat, 30 Nov 2019 11:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</guid>
+        <description>&lt;p&gt;参考 &lt;a href=&#34;https://ssu.tw/index.php/archives/31/&#34;&gt;&lt;strong&gt;使用docker快速部署shadowsocks-libev+v2ray-plugin&lt;/strong&gt;&lt;/a&gt; 和 &lt;a href=&#34;https://www.youtube.com/watch?v=8syWEJq8dH4&amp;amp;t=120s&#34;&gt;&lt;strong&gt;V2Ray拒绝减速CDN，自选香港日本CDN节点&lt;/strong&gt;&lt;/a&gt;两位的方法, 结合&lt;a href=&#34;https://teddysun.com/569.html&#34;&gt;秋水&lt;/a&gt;提供的 &lt;a href=&#34;https://hub.docker.com/r/teddysun/shadowsocks-libev/&#34;&gt;ss-libev&lt;/a&gt; 和 &lt;a href=&#34;https://hub.docker.com/r/teddysun/v2ray&#34;&gt;v2ray&lt;/a&gt; 两个 dockers 用起来非常爽，全走CDN，不再阻断，速度尚可。总结一下&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

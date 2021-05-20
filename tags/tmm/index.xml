@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tmm on 学渣的世界</title>
+    <link>http://dxz.plus/tags/tmm/</link>
+    <description>Recent content in tmm on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 18 Dec 2020 12:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/tmm/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>tmm刮削简单说明</title>
+        <link>http://dxz.plus/posts/tmm/</link>
+        <pubDate>Fri, 18 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/tmm/</guid>
+        <description>tmm tinymediamanager 可以用docker版 本地， vps 皆可 docker run -d --name=tmm \ -v /root/disk/tmm/config:/config \ -v /root/rclone:/media \ -e GROUP_ID=0 -e USER_ID=0 -e TZ=Europe/Madrid \ -p 5800:5800 \ -p 5900:5900 \ -e ENABLE_CJK_FONT=1 \ romancin/tinymediamanager:latest 老规矩 gd挂载的媒体库在 /root/rclone ,把她映射进 tmm的 m</description>
+      </item>
+      
+    
+  </channel>
+</rss>

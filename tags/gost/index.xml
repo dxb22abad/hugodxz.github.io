@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gost on 学渣的世界</title>
+    <link>http://dxz.plus/tags/gost/</link>
+    <description>Recent content in gost on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Sat, 23 Jan 2021 12:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/gost/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>sni gost hosts 分流rclone</title>
+        <link>http://dxz.plus/posts/sni/</link>
+        <pubDate>Sat, 23 Jan 2021 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/sni/</guid>
+        <description>利用gost支持sni协议做简单rclone googleaip 分流 &amp;hellip;&amp;hellip; 在 Terrance Siu (TS)大佬指点下，搞定了sni+gost+白名单 本次折腾的主要意义在于：gost</description>
+      </item>
+      
+      <item>
+        <title>gost套娃socks5</title>
+        <link>http://dxz.plus/posts/gost/</link>
+        <pubDate>Sun, 06 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/gost/</guid>
+        <description>回来真好 &amp;hellip;&amp;hellip; 各位学渣，本渣回来啦 谷歌TD凉了，虽然没凉透，但明显不如过去了，限制很多。没办法，纯是玩儿死的。 毕竟苦BAT久矣的内渣们，见到谷歌</description>
+      </item>
+      
+    
+  </channel>
+</rss>

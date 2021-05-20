@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>host大法 on 学渣的世界</title>
+    <link>http://dxz.plus/tags/host%E5%A4%A7%E6%B3%95/</link>
+    <description>Recent content in host大法 on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 08 Nov 2019 20:29:50 +0000</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/host%E5%A4%A7%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Host大法，实现Gdrive直连</title>
+        <link>http://dxz.plus/posts/host/</link>
+        <pubDate>Fri, 08 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/host/</guid>
+        <description>&lt;p&gt;结合Gdrive edu版 实现 无限流量 无限速 直连&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

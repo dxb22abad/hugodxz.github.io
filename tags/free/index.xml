@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>free on 学渣的世界</title>
+    <link>http://dxz.plus/tags/free/</link>
+    <description>Recent content in free on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Mon, 25 Nov 2019 20:29:50 +0000</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/free/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>甲骨文 免费鸡 重装系统 dd debian 9</title>
+        <link>http://dxz.plus/posts/oracle/</link>
+        <pubDate>Mon, 25 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/oracle/</guid>
+        <description>&lt;p&gt;ss最近太难受，而手里的甲骨文免费小鸡，无论如何也安装不上wireguard，系统是 ubuntu 18. 决定dd个debian。但是命令执行不下去，没办法，只好先创建一个收费鸡，系统换到16，然后在dd脚本至debian9&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

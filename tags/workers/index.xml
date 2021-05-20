@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>workers on 学渣的世界</title>
+    <link>http://dxz.plus/tags/workers/</link>
+    <description>Recent content in workers on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Mon, 04 Nov 2019 20:29:50 +0000</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/workers/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Test-图片外链是否可以用workers的</title>
+        <link>http://dxz.plus/posts/testurl/</link>
+        <pubDate>Mon, 04 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/testurl/</guid>
+        <description>&lt;p&gt;试试看看图片外链是否可以用workers的 那样就省本地空间了&lt;/p&gt;
+&lt;h2 id=&#34;测试&#34;&gt;测试&lt;/h2&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

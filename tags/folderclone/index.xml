@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>folderclone on 学渣的世界</title>
+    <link>http://dxz.plus/tags/folderclone/</link>
+    <description>Recent content in folderclone on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 15 Nov 2019 20:29:50 +0000</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/folderclone/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Autorclone 教程的一些tips及折腾中遇到的错误的解决办法</title>
+        <link>http://dxz.plus/posts/autorclonetips/</link>
+        <pubDate>Fri, 15 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonetips/</guid>
+        <description>&lt;p&gt;用autorclone对于小白的我来说还是挺挑战的，一些基本操作都不会，遇到问题只能靠google，还好多数问题都能找到答案。整理一些使用中的小技巧，和一下自己使用过程中遇到的一些错误以及解决办法，让更多小白更顺畅的折腾。保持更新 UPDATING&amp;hellip;&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 手动加 SA 到 Group 5分钟 5minuts</title>
+        <link>http://dxz.plus/posts/autorclonesagroup/</link>
+        <pubDate>Sun, 10 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesagroup/</guid>
+        <description>&lt;p&gt;手动添加 SA 到 group 非常简单,就是比较耗时,因为每天只能添加100个 SA 到group 。因为只需要添加一个用户 (admin) 即可操作 autorclone，实现更高效的操作（折腾） gdrive 互拷。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 教程 Tutorial 利用Group添加SA，5分钟搞定 gdrive转存 Adding Service Accounts (SA) to a Googlegroup</title>
+        <link>http://dxz.plus/posts/autorclonesa5minutes/</link>
+        <pubDate>Sat, 09 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesa5minutes/</guid>
+        <description>&lt;h2 id=&#34;嘚哔嘚&#34;&gt;嘚哔嘚&lt;/h2&gt;
+&lt;p&gt;为了让小白真正实现5分钟学会用好autorclone转移Gdrive资源，我真是不遗余力。。。
+经过Autorclone和Panini两位大佬指导，学会了用Group添加SA，虽然是手动的，比较费事，但是弄好以后一劳永逸。我提供的SA账号里面预计会加入900个SA。届时你只需要将这个GROUP地址&lt;code&gt;dxzdxz@googlegroups.com&lt;/code&gt;加入（源）目标TD文件夹（管理员身份）即可。&lt;/p&gt;
+&lt;p&gt;To use autorclone is pretty easy when you get the googlegroup all set. To facilitate that, here we have a finished group, which you can use to test the water. Just add &lt;code&gt;dxzdxz@googlegroups.com&lt;/code&gt; to your teamdrive(TD) or googledrive(GD) as a manager, and that&amp;rsquo;s all&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>5分钟-15G普通Gdrive账号变身无限制用不翻车账号</title>
+        <link>http://dxz.plus/posts/gdrive15g/</link>
+        <pubDate>Wed, 06 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/gdrive15g/</guid>
+        <description>&lt;p&gt;最近gdrive有很多骚操作，玩了一段时间，做个记录吧。&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

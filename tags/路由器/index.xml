@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>路由器 on 学渣的世界</title>
+    <link>http://dxz.plus/tags/%E8%B7%AF%E7%94%B1%E5%99%A8/</link>
+    <description>Recent content in 路由器 on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Tue, 10 Dec 2019 01:16:08 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/%E8%B7%AF%E7%94%B1%E5%99%A8/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Finalspeed 拯救辣鸡</title>
+        <link>http://dxz.plus/posts/finalspeed/</link>
+        <pubDate>Tue, 10 Dec 2019 01:16:08 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/finalspeed/</guid>
+        <description>&lt;p&gt;重启弃用多年的Finalspeed加速，配合软路由，实现小鸡高高飞起&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

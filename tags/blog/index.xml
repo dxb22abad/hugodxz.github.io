@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>blog on 学渣的世界</title>
+    <link>http://dxz.plus/tags/blog/</link>
+    <description>Recent content in blog on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 20 Dec 2019 08:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>解决 hugo travis 部署博客 failed and exited with 2 during . 错误</title>
+        <link>http://dxz.plus/posts/travisgo/</link>
+        <pubDate>Fri, 20 Dec 2019 08:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/travisgo/</guid>
+        <description>&lt;h1 id=&#34;案由&#34;&gt;案由&lt;/h1&gt;
+&lt;p&gt;昨天晚上想要更新一下博客，因为发现之前的 &lt;a href=&#34;https://dxz.plus/posts/dockerv2rayssembytrojancdn/&#34;&gt;docker v2ray ss emby CDN 自选 cloudflare 节点 简单教程 + trojan 特洛伊&lt;/a&gt; 可以完全自动化了。
+但是在推送到github的时候，travis控制台出现&lt;code&gt;failed and exited with 2 during .&lt;/code&gt;错误，各种重启，折腾，睡觉，折腾，依然无效
+&lt;img src=&#34;https://share.dxz.plus/BlogContent/Screen%20Shot%202019-12-20%20at%208.42.05%20AM-problm.png&#34; alt=&#34;error&#34;&gt;
+真是难坏小白了&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>甲骨文 免费鸡 重装系统 dd debian 9</title>
+        <link>http://dxz.plus/posts/oracle/</link>
+        <pubDate>Mon, 25 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/oracle/</guid>
+        <description>&lt;p&gt;ss最近太难受，而手里的甲骨文免费小鸡，无论如何也安装不上wireguard，系统是 ubuntu 18. 决定dd个debian。但是命令执行不下去，没办法，只好先创建一个收费鸡，系统换到16，然后在dd脚本至debian9&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Test-图片外链是否可以用workers的</title>
+        <link>http://dxz.plus/posts/testurl/</link>
+        <pubDate>Mon, 04 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/testurl/</guid>
+        <description>&lt;p&gt;试试看看图片外链是否可以用workers的 那样就省本地空间了&lt;/p&gt;
+&lt;h2 id=&#34;测试&#34;&gt;测试&lt;/h2&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

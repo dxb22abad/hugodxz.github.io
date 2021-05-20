@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Presentations on 学渣的世界</title>
+    <link>http://dxz.plus/pt/</link>
+    <description>Recent content in Presentations on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 30 Nov 2018 20:48:10 +0900</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/pt/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Fourth</title>
+        <link>http://dxz.plus/pt/dir/fourth/</link>
+        <pubDate>Fri, 30 Nov 2018 20:48:10 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/pt/dir/fourth/</guid>
+        <description></description>
+      </item>
+      
+      <item>
+        <title>Third</title>
+        <link>http://dxz.plus/pt/third/</link>
+        <pubDate>Fri, 30 Nov 2018 20:46:30 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/pt/third/</guid>
+        <description></description>
+      </item>
+      
+      <item>
+        <title>Second</title>
+        <link>http://dxz.plus/pt/second/</link>
+        <pubDate>Fri, 30 Nov 2018 20:45:24 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/pt/second/</guid>
+        <description></description>
+      </item>
+      
+      <item>
+        <title>First</title>
+        <link>http://dxz.plus/pt/first/</link>
+        <pubDate>Fri, 30 Nov 2018 19:45:20 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/pt/first/</guid>
+        <description></description>
+      </item>
+      
+    
+  </channel>
+</rss>

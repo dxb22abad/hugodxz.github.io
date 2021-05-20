@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>公告 on 学渣的世界</title>
+    <link>http://dxz.plus/categories/%E5%85%AC%E5%91%8A/</link>
+    <description>Recent content in 公告 on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Thu, 26 Mar 2020 21:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/categories/%E5%85%AC%E5%91%8A/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>暂时离开一段时间</title>
+        <link>http://dxz.plus/posts/notice/</link>
+        <pubDate>Thu, 26 Mar 2020 21:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/notice/</guid>
+        <description>&lt;p&gt;个人的一点私事，是在抽不开身，短时间内也限制TG，博客暂停更新&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

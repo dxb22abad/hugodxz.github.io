@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>math on 学渣的世界</title>
+    <link>http://dxz.plus/categories/math/</link>
+    <description>Recent content in math on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 16 Nov 2018 12:00:06 +0900</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/categories/math/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>MathJax support</title>
+        <link>http://dxz.plus/posts/test-mathjax/</link>
+        <pubDate>Fri, 16 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-mathjax/</guid>
+        <description>When \(a \ne 0\), there are two solutions to \((ax^2 + bx + c = 0)\) and they are \[x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\]</description>
+      </item>
+      
+      <item>
+        <title>Katex support</title>
+        <link>http://dxz.plus/posts/test-katext/</link>
+        <pubDate>Thu, 15 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-katext/</guid>
+        <description>The following
+$$ \int_{a}^{b} x^2 dx $$
+Is an integral
+$$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$
+Enable Katex in the config file by setting the katex param to true. This will import the necessary Katex CSS/JS.
+See the online reference of supported TeX functions.
+Note: For inline math to render correctly, your content file extension must be .mmark. See the official mmark site.
+Inline math: $$ \varphi = \dfrac{1+\sqrt5}{2}= 1.</description>
+      </item>
+      
+    
+  </channel>
+</rss>
