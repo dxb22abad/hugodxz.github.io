@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>epub on 学渣的世界</title>
+    <link>http://dxz.plus/tags/epub/</link>
+    <description>Recent content in epub on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Wed, 11 Dec 2019 13:48:26 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/epub/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>善用谷歌查找电子书</title>
+        <link>http://dxz.plus/posts/searchboos/</link>
+        <pubDate>Wed, 11 Dec 2019 13:48:26 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/searchboos/</guid>
+        <description>&lt;p&gt;谷歌是好用的，但是我不会，之前&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

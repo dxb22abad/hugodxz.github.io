@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>action on 学渣的世界</title>
+    <link>http://dxz.plus/tags/action/</link>
+    <description>Recent content in action on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Thu, 15 Apr 2021 20:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/action/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>GitHub Action 转存 Onedrive Google Drive 6盘</title>
+        <link>http://dxz.plus/posts/githubaction/</link>
+        <pubDate>Thu, 15 Apr 2021 20:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/githubaction/</guid>
+        <description>GithubAction新建workflow 感谢 jiegto 提供的flow 可以在这里获取 为了方便小白如我 直接上图 其中填入如下内容，注意改一下 gclone copy 那里，</description>
+      </item>
+      
+    
+  </channel>
+</rss>

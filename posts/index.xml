@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 学渣的世界</title>
+    <link>http://dxz.plus/posts/</link>
+    <description>Recent content in Posts on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Wed, 22 Jan 2020 12:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>snap2html linux 定时推送 github</title>
+        <link>http://dxz.plus/posts/snap2html/</link>
+        <pubDate>Wed, 22 Jan 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/snap2html/</guid>
+        <description>&lt;h2 id=&#34;heading&#34;&gt;新年好&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.rlvision.com/snap2html/about.php&#34;&gt;Snap2Html&lt;/a&gt; 是真的好用，B格高高的&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/alepnm/Snap2HTML&#34;&gt;linux&lt;/a&gt;版本功能基本也都有了，可以部署在小鸡上面自动运行&lt;/p&gt;
+&lt;p&gt;在&lt;a href=&#34;https://t.me/SelfEnough&#34;&gt;茶先生&lt;/a&gt;和&lt;a href=&#34;https://t.me/Pan1n1&#34;&gt;panini&lt;/a&gt;的帮助下，终于实现了标题&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Emby Docker 数据库操作</title>
+        <link>http://dxz.plus/posts/embyconfig/</link>
+        <pubDate>Fri, 20 Dec 2019 22:09:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/embyconfig/</guid>
+        <description>&lt;h1 id=&#34;heading&#34;&gt;介绍&lt;/h1&gt;
+&lt;p&gt;Docker Emby方便之处不仅仅是容易搭建，连数据库转移也非常容易。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>解决 hugo travis 部署博客 failed and exited with 2 during . 错误</title>
+        <link>http://dxz.plus/posts/travisgo/</link>
+        <pubDate>Fri, 20 Dec 2019 08:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/travisgo/</guid>
+        <description>&lt;h1 id=&#34;heading&#34;&gt;案由&lt;/h1&gt;
+&lt;p&gt;昨天晚上想要更新一下博客，因为发现之前的 &lt;a href=&#34;https://dxz.plus/posts/dockerv2rayssembytrojancdn/&#34;&gt;docker v2ray ss emby CDN 自选 cloudflare 节点 简单教程 + trojan 特洛伊&lt;/a&gt; 可以完全自动化了。
+但是在推送到github的时候，travis控制台出现&lt;code&gt;failed and exited with 2 during .&lt;/code&gt;错误，各种重启，折腾，睡觉，折腾，依然无效
+&lt;img src=&#34;https://share.dxz.plus/BlogContent/Screen%20Shot%202019-12-20%20at%208.42.05%20AM-problm.png&#34; alt=&#34;error&#34;&gt;
+真是难坏小白了&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>善用谷歌查找电子书</title>
+        <link>http://dxz.plus/posts/searchboos/</link>
+        <pubDate>Wed, 11 Dec 2019 13:48:26 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/searchboos/</guid>
+        <description>&lt;p&gt;谷歌是好用的，但是我不会，之前&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Finalspeed 拯救辣鸡</title>
+        <link>http://dxz.plus/posts/finalspeed/</link>
+        <pubDate>Tue, 10 Dec 2019 01:16:08 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/finalspeed/</guid>
+        <description>&lt;p&gt;重启弃用多年的Finalspeed加速，配合软路由，实现小鸡高高飞起&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>docker v2ray ss  emby  CDN 自选 cloudflare 节点 简单教程 &#43; trojan 特洛伊</title>
+        <link>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</link>
+        <pubDate>Sat, 30 Nov 2019 11:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</guid>
+        <description>&lt;p&gt;参考 &lt;a href=&#34;https://ssu.tw/index.php/archives/31/&#34;&gt;&lt;strong&gt;使用docker快速部署shadowsocks-libev+v2ray-plugin&lt;/strong&gt;&lt;/a&gt; 和 &lt;a href=&#34;https://www.youtube.com/watch?v=8syWEJq8dH4&amp;amp;t=120s&#34;&gt;&lt;strong&gt;V2Ray拒绝减速CDN，自选香港日本CDN节点&lt;/strong&gt;&lt;/a&gt;两位的方法, 结合&lt;a href=&#34;https://teddysun.com/569.html&#34;&gt;秋水&lt;/a&gt;提供的 &lt;a href=&#34;https://hub.docker.com/r/teddysun/shadowsocks-libev/&#34;&gt;ss-libev&lt;/a&gt; 和 &lt;a href=&#34;https://hub.docker.com/r/teddysun/v2ray&#34;&gt;v2ray&lt;/a&gt; 两个 dockers 用起来非常爽，全走CDN，不再阻断，速度尚可。总结一下&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>甲骨文 免费鸡 重装系统 dd debian 9</title>
+        <link>http://dxz.plus/posts/oracle/</link>
+        <pubDate>Mon, 25 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/oracle/</guid>
+        <description>&lt;p&gt;ss最近太难受，而手里的甲骨文免费小鸡，无论如何也安装不上wireguard，系统是 ubuntu 18. 决定dd个debian。但是命令执行不下去，没办法，只好先创建一个收费鸡，系统换到16，然后在dd脚本至debian9&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Autorclone 教程的一些tips及折腾中遇到的错误的解决办法</title>
+        <link>http://dxz.plus/posts/autorclonetips/</link>
+        <pubDate>Fri, 15 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonetips/</guid>
+        <description>&lt;p&gt;用autorclone对于小白的我来说还是挺挑战的，一些基本操作都不会，遇到问题只能靠google，还好多数问题都能找到答案。整理一些使用中的小技巧，和一下自己使用过程中遇到的一些错误以及解决办法，让更多小白更顺畅的折腾。保持更新 UPDATING&amp;hellip;&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 手动加 SA 到 Group 5分钟 5minuts</title>
+        <link>http://dxz.plus/posts/autorclonesagroup/</link>
+        <pubDate>Sun, 10 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesagroup/</guid>
+        <description>&lt;p&gt;手动添加 SA 到 group 非常简单,就是比较耗时,因为每天只能添加100个 SA 到group 。因为只需要添加一个用户 (admin) 即可操作 autorclone，实现更高效的操作（折腾） gdrive 互拷。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 教程 Tutorial 利用Group添加SA，5分钟搞定 gdrive转存 Adding Service Accounts (SA) to a Googlegroup</title>
+        <link>http://dxz.plus/posts/autorclonesa5minutes/</link>
+        <pubDate>Sat, 09 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesa5minutes/</guid>
+        <description>&lt;h2 id=&#34;heading&#34;&gt;嘚哔嘚&lt;/h2&gt;
+&lt;p&gt;为了让小白真正实现5分钟学会用好autorclone转移Gdrive资源，我真是不遗余力。。。
+经过Autorclone和Panini两位大佬指导，学会了用Group添加SA，虽然是手动的，比较费事，但是弄好以后一劳永逸。我提供的SA账号里面预计会加入900个SA。届时你只需要将这个GROUP地址&lt;code&gt;dxzdxz@googlegroups.com&lt;/code&gt;加入（源）目标TD文件夹（管理员身份）即可。&lt;/p&gt;
+&lt;p&gt;To use autorclone is pretty easy when you get the googlegroup all set. To facilitate that, here we have a finished group, which you can use to test the water. Just add &lt;a href=&#34;mailto:%60dxzdxz@googlegroups.com&#34;&gt;`dxzdxz@googlegroups.com&lt;/a&gt;` to your teamdrive(TD) or googledrive(GD) as a manager, and that&#39;s all&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Host大法，实现Gdrive直连</title>
+        <link>http://dxz.plus/posts/host/</link>
+        <pubDate>Fri, 08 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/host/</guid>
+        <description>&lt;p&gt;结合Gdrive edu版 实现 无限流量 无限速 直连&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>5分钟-15G普通Gdrive账号变身无限制用不翻车账号</title>
+        <link>http://dxz.plus/posts/gdrive15g/</link>
+        <pubDate>Wed, 06 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/gdrive15g/</guid>
+        <description>&lt;p&gt;最近gdrive有很多骚操作，玩了一段时间，做个记录吧。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>rclone 一条命令备份docker搭建的typecho wordpress数据</title>
+        <link>http://dxz.plus/posts/backuptypecho/</link>
+        <pubDate>Tue, 05 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/backuptypecho/</guid>
+        <description>&lt;h2 id=&#34;heading&#34;&gt;废话&lt;/h2&gt;
+&lt;p&gt;typecho没有wordpress那么多插件，自动上传数据库啥的，但是wordpress想备份到gdrive，都要加钱买专业版。但在docker这，你不用花钱。
+下面只示例typecho，wordpress同理。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Test-图片外链是否可以用workers的</title>
+        <link>http://dxz.plus/posts/testurl/</link>
+        <pubDate>Mon, 04 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/testurl/</guid>
+        <description>&lt;p&gt;试试看看图片外链是否可以用workers的 那样就省本地空间了&lt;/p&gt;
+&lt;h2 id=&#34;heading&#34;&gt;测试&lt;/h2&gt;</description>
+      </item>
+      
+      <item>
+        <title>VPS 5分钟极速搭建emby服务</title>
+        <link>http://dxz.plus/posts/emby/</link>
+        <pubDate>Sun, 03 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/emby/</guid>
+        <description>&lt;p&gt;免费的虽然是最贵的，但是性价比却无可争议的+∞&lt;/p&gt;
+&lt;h2 id=&#34;heading&#34;&gt;废话一堆&lt;/h2&gt;
+&lt;p&gt;写这个教程是主要是为了测试docker搭建typecho，由于docker映射文件夹简直太方便了，所有网站数据分分钟打包，备份，搬家。适合我这样的瞎折腾。
+更主要的，我们手里有n多垃圾小鸡，除了探针，网盘目录外还有别的骚法么？
+这篇文章带你骚。
+基本上你的小鸡速度够快，尤其是晚上，比如北方联通用justhost，甲骨文之类的都可以非常爽快的试用这个方法。
+由于是本地kodi解码，串流播放，服务器没啥压力，配置不需要多高，同时也没必要买emby专业版了，我的plex算是白买了，nas我还特意买的J3455服务端解码，看来也是浪费。
+虽然读取的是gdrive电影，但是由于是vps搭建，host大法基本用不到了。并且这个emby个人服务应该不会触及红线，系统占用低，不用担心被各种ban(GFW&amp;amp;VPS providers)
+5分钟也就是个标题，看看就好，熟练了也就10分钟以内就搞定。我一连气儿搭了3个服务，太爽了，不分享出来是不行的，憋着难受&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Placeholder Text</title>
+        <link>http://dxz.plus/posts/placeholder-text/</link>
+        <pubDate>Sat, 09 Mar 2019 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/placeholder-text/</guid>
+        <description>&lt;p&gt;Lorem est tota propiore conpellat pectoribus de
+pectora summo.&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Viz support</title>
+        <link>http://dxz.plus/posts/test-viz/</link>
+        <pubDate>Sun, 18 Nov 2018 21:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-viz/</guid>
+        <description>digraph G { subgraph cluster_0 { style=filled; color=lightgrey; node [style=filled,color=white]; a0 -&amp;gt; a1 -&amp;gt; a2 -&amp;gt; a3; label = &amp;quot;process #1&amp;quot;; } subgraph cluster_1 { node [style=filled]; b0 -&amp;gt; b1 -&amp;gt; b2 -&amp;gt; b3; label = &amp;quot;process #2&amp;quot;; color=blue } start -&amp;gt; a0; start -&amp;gt; b0; a1 -&amp;gt; b3; b2 -&amp;gt; a3; a3 -&amp;gt; a0; a3 -&amp;gt; end; b3 -&amp;gt; end; start [shape=Mdiamond]; end [shape=Msquare]; } </description>
+      </item>
+      
+      <item>
+        <title>Wavedrom support</title>
+        <link>http://dxz.plus/posts/test-wavedrom/</link>
+        <pubDate>Sun, 18 Nov 2018 18:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-wavedrom/</guid>
+        <description>{ &amp;quot;signal&amp;quot;: [ {&amp;quot;name&amp;quot;: &amp;quot;CLK&amp;quot;, &amp;quot;wave&amp;quot;: &amp;quot;p.....|...&amp;quot;}, {&amp;quot;name&amp;quot;:&amp;quot;DAT&amp;quot;, &amp;quot;wave&amp;quot;:&amp;quot;x.345x|=.x&amp;quot;, &amp;quot;data&amp;quot;:[&amp;quot;A&amp;quot;,&amp;quot;B&amp;quot;,&amp;quot;C&amp;quot;,&amp;quot;D&amp;quot;]}, {&amp;quot;name&amp;quot;: &amp;quot;REQ&amp;quot;, &amp;quot;wave&amp;quot;: &amp;quot;0.1..0|1.0&amp;quot;}, {}, {&amp;quot;name&amp;quot;: &amp;quot;ACK&amp;quot;, &amp;quot;wave&amp;quot;: &amp;quot;1.....|01.&amp;quot;} ]} </description>
+      </item>
+      
+      <item>
+        <title>Chart support</title>
+        <link>http://dxz.plus/posts/test-chartjs/</link>
+        <pubDate>Sun, 18 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-chartjs/</guid>
+        <description>{ &amp;quot;type&amp;quot;: &amp;quot;bar&amp;quot;, &amp;quot;data&amp;quot;: { &amp;quot;labels&amp;quot;: [&amp;quot;One&amp;quot;, &amp;quot;Two&amp;quot;, &amp;quot;Three&amp;quot;, &amp;quot;Four&amp;quot;, &amp;quot;Five&amp;quot;, &amp;quot;Six&amp;quot;], &amp;quot;datasets&amp;quot;: [{ &amp;quot;label&amp;quot;: &amp;quot;# of Votes&amp;quot;, &amp;quot;data&amp;quot;: [12, 19, 3, 5, 3, 8] }] } } { &amp;quot;type&amp;quot;: &amp;quot;line&amp;quot;, &amp;quot;data&amp;quot;: { &amp;quot;labels&amp;quot;: [&amp;quot;One&amp;quot;, &amp;quot;Two&amp;quot;, &amp;quot;Three&amp;quot;, &amp;quot;Four&amp;quot;, &amp;quot;Five&amp;quot;, &amp;quot;Six&amp;quot;], &amp;quot;datasets&amp;quot;: [ { &amp;quot;label&amp;quot;: &amp;quot;# of Votes&amp;quot;, &amp;quot;data&amp;quot;: [12, 19, 3, 5, 2, 3], &amp;quot;backgroundColor&amp;quot;:&amp;quot;transparent&amp;quot;, &amp;quot;borderColor&amp;quot;:&amp;quot;orange&amp;quot; }, { &amp;quot;label&amp;quot;: &amp;quot;Some other set&amp;quot;, &amp;quot;data&amp;quot;: [15, 8, 13, 5, 5, 9], &amp;quot;backgroundColor&amp;quot;:&amp;quot;transparent&amp;quot;, &amp;quot;borderColor&amp;quot;:&amp;quot;#44ccff&amp;quot; } ] } } </description>
+      </item>
+      
+      <item>
+        <title>JS Sequence Diagram support</title>
+        <link>http://dxz.plus/posts/test-js-sequence-diagrams/</link>
+        <pubDate>Sun, 18 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-js-sequence-diagrams/</guid>
+        <description>Alice-&amp;gt;Bob: Hello Bob, how are you? Note right of Bob: Bob thinks Bob--&amp;gt;Alice: I am good thanks! Title: Here is a title A-&amp;gt;B: Normal line B--&amp;gt;C: Dashed line C-&amp;gt;&amp;gt;D: Open arrow D--&amp;gt;&amp;gt;A: Dashed open arrow </description>
+      </item>
+      
+      <item>
+        <title>Mermaid support</title>
+        <link>http://dxz.plus/posts/test-mermaid/</link>
+        <pubDate>Sat, 17 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-mermaid/</guid>
+        <description>graph TD; A--&amp;gt;B; A--&amp;gt;C; B--&amp;gt;D; C--&amp;gt;D; graph TD; A--&amp;gt;B; A--&amp;gt;C; B--&amp;gt;D; C--&amp;gt;D; graph TD; A--&amp;gt;B; A--&amp;gt;C; B--&amp;gt;D; C--&amp;gt;D; sequenceDiagram participant Alice participant Bob Alice-&amp;gt;John: Hello John, how are you? loop Healthcheck John-&amp;gt;John: Fight against hypochondria end Note right of John: Rational thoughts &amp;lt;br/&amp;gt;prevail... John--&amp;gt;Alice: Great! John-&amp;gt;Bob: How about you? Bob--&amp;gt;John: Jolly good! graph TD A[Hard] --&amp;gt;|Text| B(Round) B --&amp;gt; C{Decision} C --&amp;gt;|One| D[Result 1] C --&amp;gt;|Two| E[Result 2] gantt section Section Completed :done, des1, 2014-01-06,2014-01-08 Active :active, des2, 2014-01-07, 3d Parallel 1 : des3, after des1, 1d Parallel 2 : des4, after des1, 1d Parallel 3 : des5, after des3, 1d Parallel 4 : des6, after des4, 1d classDiagram Class01 &amp;lt;|-- AveryLongClass : Cool &amp;lt;&amp;lt;interface&amp;gt;&amp;gt; Class01 Class09 --&amp;gt; C2 : Where am i?</description>
+      </item>
+      
+      <item>
+        <title>MathJax support</title>
+        <link>http://dxz.plus/posts/test-mathjax/</link>
+        <pubDate>Fri, 16 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-mathjax/</guid>
+        <description>When \(a \ne 0\), there are two solutions to \((ax^2 + bx + c = 0)\) and they are \[x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\]</description>
+      </item>
+      
+      <item>
+        <title>Katex support</title>
+        <link>http://dxz.plus/posts/test-katext/</link>
+        <pubDate>Thu, 15 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-katext/</guid>
+        <description>The following
+$$ \int_{a}^{b} x^2 dx $$
+Is an integral
+$$ \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } $$
+Enable Katex in the config file by setting the katex param to true. This will import the necessary Katex CSS/JS.
+See the online reference of supported TeX functions.
+Note: For inline math to render correctly, your content file extension must be .mmark. See the official mmark site.
+Inline math: $$ \varphi = \dfrac{1+\sqrt5}{2}= 1.</description>
+      </item>
+      
+      <item>
+        <title>Flowchart support</title>
+        <link>http://dxz.plus/posts/test-flowchart/</link>
+        <pubDate>Wed, 14 Nov 2018 12:00:06 +0900</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/test-flowchart/</guid>
+        <description>st=&amp;gt;start: Start|past:&amp;gt;http://www.google.com[blank] e=&amp;gt;end: End|future:&amp;gt;http://www.google.com op1=&amp;gt;operation: My Operation|past op2=&amp;gt;operation: Stuff|current sub1=&amp;gt;subroutine: My Subroutine|invalid cond=&amp;gt;condition: Yes or No?|approved:&amp;gt;http://www.google.com c2=&amp;gt;condition: Good idea|rejected io=&amp;gt;inputoutput: catch something...|future st-&amp;gt;op1(right)-&amp;gt;cond cond(yes, right)-&amp;gt;c2 cond(no)-&amp;gt;sub1(left)-&amp;gt;op1 c2(yes)-&amp;gt;io-&amp;gt;e c2(no)-&amp;gt;op2-&amp;gt;e </description>
+      </item>
+      
+      <item>
+        <title>Markdown Syntax Guide</title>
+        <link>http://dxz.plus/posts/markdown-syntax/</link>
+        <pubDate>Sun, 11 Mar 2018 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/markdown-syntax/</guid>
+        <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Rich Content</title>
+        <link>http://dxz.plus/posts/rich-content/</link>
+        <pubDate>Sat, 10 Mar 2018 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/rich-content/</guid>
+        <description>&lt;p&gt;Hugo ships with several &lt;a href=&#34;https://gohugo.io/content-management/shortcodes/#use-hugo-s-built-in-shortcodes&#34;&gt;Built-in Shortcodes&lt;/a&gt; for rich content, along with a &lt;a href=&#34;https://gohugo.io/about/hugo-and-gdpr/&#34;&gt;Privacy Config&lt;/a&gt; and a set of Simple Shortcodes that enable static and no-JS versions of various social media embeds.&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Math Typesetting</title>
+        <link>http://dxz.plus/posts/math-typesetting/</link>
+        <pubDate>Thu, 08 Mar 2018 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/math-typesetting/</guid>
+        <description>&lt;p&gt;Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Emoji Support</title>
+        <link>http://dxz.plus/posts/emoji-support/</link>
+        <pubDate>Mon, 05 Mar 2018 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/emoji-support/</guid>
+        <description>&lt;p&gt;Emoji can be enabled in a Hugo project in a number of ways.&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Posts</title>
+        <link>http://dxz.plus/posts/_index.ko/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/_index.ko/</guid>
+        <description></description>
+      </item>
+      
+    
+  </channel>
+</rss>

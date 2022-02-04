@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PMS on 学渣的世界</title>
+    <link>http://dxz.plus/tags/pms/</link>
+    <description>Recent content in PMS on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Thu, 04 Feb 2021 00:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/pms/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>plex服务器刮削包提供</title>
+        <link>http://dxz.plus/posts/pmspackage/</link>
+        <pubDate>Thu, 04 Feb 2021 00:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/pmspackage/</guid>
+        <description>&lt;p&gt;PMS sharing project - scraperPackege&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>plex服务器集群 PMS cluster</title>
+        <link>http://dxz.plus/posts/pms/</link>
+        <pubDate>Sat, 12 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/pms/</guid>
+        <description>PMS sharing project &amp;hellip;&amp;hellip; 这个中转真的很麻烦，发出来全当引玉了。。。丢人不怕，能帮到你就好 00盘复兴计划开始了，预计农历上线 主要内容还是和之前00盘类似 提供小</description>
+      </item>
+      
+    
+  </channel>
+</rss>

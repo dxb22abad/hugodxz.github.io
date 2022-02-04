@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>娱乐 on 学渣的世界</title>
+    <link>http://dxz.plus/tags/%E5%A8%B1%E4%B9%90/</link>
+    <description>Recent content in 娱乐 on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Fri, 20 Dec 2019 22:09:50 +0000</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/%E5%A8%B1%E4%B9%90/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Emby Docker 数据库操作</title>
+        <link>http://dxz.plus/posts/embyconfig/</link>
+        <pubDate>Fri, 20 Dec 2019 22:09:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/embyconfig/</guid>
+        <description>&lt;h1 id=&#34;介绍&#34;&gt;介绍&lt;/h1&gt;
+&lt;p&gt;Docker Emby方便之处不仅仅是容易搭建，连数据库转移也非常容易。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>VPS 5分钟极速搭建emby服务</title>
+        <link>http://dxz.plus/posts/emby/</link>
+        <pubDate>Sun, 03 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/emby/</guid>
+        <description>&lt;p&gt;免费的虽然是最贵的，但是性价比却无可争议的+∞&lt;/p&gt;
+&lt;h2 id=&#34;废话一堆&#34;&gt;废话一堆&lt;/h2&gt;
+&lt;p&gt;写这个教程是主要是为了测试docker搭建typecho，由于docker映射文件夹简直太方便了，所有网站数据分分钟打包，备份，搬家。适合我这样的瞎折腾。
+更主要的，我们手里有n多垃圾小鸡，除了探针，网盘目录外还有别的骚法么？
+这篇文章带你骚。
+基本上你的小鸡速度够快，尤其是晚上，比如北方联通用justhost，甲骨文之类的都可以非常爽快的试用这个方法。
+由于是本地kodi解码，串流播放，服务器没啥压力，配置不需要多高，同时也没必要买emby专业版了，我的plex算是白买了，nas我还特意买的J3455服务端解码，看来也是浪费。
+虽然读取的是gdrive电影，但是由于是vps搭建，host大法基本用不到了。并且这个emby个人服务应该不会触及红线，系统占用低，不用担心被各种ban(GFW&amp;amp;VPS providers)
+5分钟也就是个标题，看看就好，熟练了也就10分钟以内就搞定。我一连气儿搭了3个服务，太爽了，不分享出来是不行的，憋着难受&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

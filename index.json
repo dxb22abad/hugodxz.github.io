@@ -1,0 +1,1432 @@
+[
+{
+	"uri": "http://dxz.plus/posts/autoscanbykolicime/",
+	"title": "Autoscan 监控媒体库 by Kolicime",
+	"tags": ["Github", "autoscan", "emby", "plex", "googledrive", "gd"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "前面的话 感谢 Kolicime 提供的全部教程\n一转眼就2022了，2022注定是不平凡的一年，抗疫新冠，未竟全功，冬奥盛会，不日将至，二十大盛会，启动在即，“十四五”规划，攻坚正酣。。。 呵呵，扯远了。。。\n开博客本身也是喜欢研究这些浪费时间的东西，毕竟time is money，钱都花了，拿出来最大化岂不是更好\n早想更新博客了，但是最近累成猪狗不如，要不是群里大佬提示，还不会更新\n00盘大概也活了有段时间了，从白嫖 edu 到 GS 到 WS、onedrive、世纪互联，从 Panini 到茶先生 到Bryan 到现在的 Veterinary，00盘是我们共同的资源，共同的时间，共同的心血，共同的小hobby，希望能活长久吧，算是一个小小新年愿望\n再一个小心愿就是， 群里讨论 -\u0026gt; 博客分享 -\u0026gt; 更多人进群 -\u0026gt; 吸引更多大佬 -\u0026gt; 分享更多有趣的东西 -\u0026gt; 博客分享 -\u0026gt; ···· 这样一直下去\n00群现在有500多人，也不想吸收新人了，自己玩开心就好\n其实主要还是敏感资源的关系，避免大规模分享，谢绝任何盈利\n00 或许不再开放，或许抽风开放\n感谢各位看到这里，开始正题\n准备工作   一个已经加入00盘的SA帐号\n  一台能访问google drive的服务器，推荐使用Ubuntu/Debian系统\n  一个已经搭好，并且已经正常挂载了00盘的plex/emby\n  开工！ 1. 下载autoscan 根据自己服务器架构，到这里下载对应版本的autoscan。X86架构的可以直接使用下面的命令\nwget https://github.com/Cloudbox/autoscan/releases/download/v1.2.0/autoscan_v1.2.0_linux_amd64 -O autoscan\n2. 编写配置文件 下载了autoscan之后先./autoscan运行一次，它会自动生成对应的配置文件和数据库等\n运行了之后直接ctrl + c结束，然后去~/.config/autoscan目录，正常来说会生成三个文件，activity.log 是运行日志，autoscan.db是数据库文件，不需要管，config.yml就是我们要修改的配置文件了\n下面的配置文件仅针对于使用autoscan监控google drive，并上报plex，plex会同步添加或删除相应的媒体\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43  minimum-age:30m#每隔多长时间向plex/emby上报一次修改。可以根据需求调整anchors:#锚文件 autoscan根据锚文件存在与否判断挂载是否成功 可以设置多个，但每个挂载的盘设置一个即可#锚文件根据官方文档推荐是单独新建一个文件，但实际可以任意选择一个存在于盘内的文件#群主可以在根目录新建一个00.anchor和01.anchor供大家使用- /home/plex/ling/电影/4K Killer (2019)/poster.jpg#我把00盘挂载在了/home/plex/ling，根据自己实际情况修改authentication:#webhook的认证，可选username:abcdpassword:abcdport:3030triggers:bernard:- account:/home/autoscan/autoscan/service-account.json#sa帐号的位置cron:\u0026#34;*/5 * * * *\u0026#34;#隔5分钟检测一次团队盘是否有改动，可以自行调整，不建议调太低drives:- id:0APWm9qKAr7DAUk9PVA#00盘根目录- id:0AKTXf2kbWi04Uk9PVA#01盘根目录rewrite:#from部分照着填即可，to部分根据自己挂载的目录修改，如果需要综艺，百科，按照格式加就行了- from:^/电影/to:/home/plex/ling/电影/- from:^/东亚/to:/home/plex/ling/东亚/- from:^/天朝/to:/home/plex/ling/天朝/- from:^/动画/to:/home/plex/ling/动画/- from:^/欧美/to:/home/plex/ling/欧美/exclude:#这些类型的文件改动不上报给plex/emby- \u0026#39;\\.[srt,ass,ssa,nfo,jpg,png,txt]$\u0026#39;targets:plex:#如果使用的是emby，看下面- url:https://plex.baidu.com#填你plex的域名或IPtoken:qweqwertasda#plex令牌，获取方式看下面rewrite:#如果使用的是docker才需要，本机安装应该不需要- from:/home/plex/ling/#填写你本机00盘实际挂载的路径to:/data/ling/ #容器内00盘的路径，如果不知道可以看下面  这里是下面  如果使用的是emby，targets里面参照这里填写，与plex大同小异 plex令牌获取方式参照官方文档 如果不知道容器内00盘的路径，可以使用docker exec -it plex bash进入容器内寻找，按crtl + a + d退出容器  3. 进程守护 cat \u0026gt; /usr/lib/systemd/system/autoscan.service\u0026lt;\u0026lt;EOF\r[Unit]\rDescription=AutoScan Daemon Service\rAfter=network.target\r[Service]\r#UMask=000\rType=simple\rUser=root\rExecStart=/home/autoscan/autoscan/autoscan\r#ExecStop=/usr/bin/killall -s 9 /home/autoscan/autoscan/autoscan\rRestart=always\rTimeoutSec=300\r[Install]\rWantedBy=multi-user.target\rEOF\r将ExecStart部分修改为你autoscan的路径后，可以将上面的代码直接粘贴到终端\n 启动 systemctl start autoscan 重启 systemctl restart autoscan 停止 systemctl stop autoscan 查看状态 systemctl status autoscan 开机自启 systemctl enable autoscan  最后 这里只介绍了autoscan用法的一种，它还可以搭配sonarr、radarr等软件使用，更进阶的用法可以自己去看文档\n在修改完配置文件之后记得重启一下服务\n如果要查看autoscan的日志，可以使用\ntail -f ~/.config/autoscan/activity.log\n00盘因为内容比较多，在autoscan启动之后第一时间可能看不到内容输出，可以过十几分钟在看，或者是等第二天团队盘内容更新了再看\nDocker config updated by DXZ 基本上和直装一样，配置文件可以参考直装\ndocker run \\\r--name=autoscan \\\r-e \u0026quot;PUID=1000\u0026quot; \\\r-e \u0026quot;PGID=1001\u0026quot; \\\r-p 3030:3030 \\\r-v \u0026quot;/root/disk/autoscan:/config\u0026quot; \\\r-v \u0026quot;/root/rclone/00alpha:/00/00alpha:ro\u0026quot; \\\r--restart=unless-stopped \\\r-d cloudb0x/autoscan\r配置文件就一个，根据情况自己改就好了\nnano /root/disk/autoscan/config.yml\nminimum-age: 30m #每隔多长时间向plex/emby上报一次修改。可以根据需求调整\ranchors: #锚文件 autoscan根据锚文件存在与否判断挂载是否成功 可以设置多个，但每个挂载的盘设置一个即可\r#锚文件根据官方文档推荐是单独新建一个文件，但实际可以任意选择一个存在于盘内的文件\r#群主可以在根目录新建一个00.anchor和01.anchor供大家使用 —— DONE！\r- /00/00alpha/TEST/00.anchor #我把00盘挂载在了/root/rclone/00alpha，前面的/00 是容器内部，大家根据自己实际情况修改\r- /00/00alpha/欧美/01.anchor\rauthentication: #webhook的认证，可选\rusername: abcd\rpassword: abcd\rport: 3030\rtriggers:\rbernard:\r- account: /config/autoscan.json #sa帐号的位置\rcron: \u0026quot;*/5 * * * *\u0026quot; #隔5分钟检测一次团队盘是否有改动，可以自行调整，不建议调太低\rdrives:\r- id: 0APWm9qKAr7DAUk9PVA #00盘根目录\r- id: 0AKTXf2kbWi04Uk9PVA #01盘根目录\rrewrite: #from部分照着填即可，to部分根据自己挂载的目录修改，如果需要综艺，百科，按照格式加就行了\r- from: ^/电影/\rto: /00/00alpha/电影/\r- from: ^/东亚/\rto: /00/00alpha/东亚/\r- from: ^/天朝/\rto: /00/00alpha/天朝/\r- from: ^/动画/\rto: /00/00alpha/动画/\r- from: ^/欧美/\rto: /00/00alpha/欧美/\r- from: ^/百科/\rto: /00/00alpha/百科/\rexclude: #这些类型的文件改动不上报给plex/emby\r- '\\.[srt,ass,ssa,nfo,jpg,png,txt]$'\rtargets:\remby: #如果使用的是emby，看下面\r- url: http://10.2.2.113:8096 #填你emby的域名或IP，这个直接在本机更简单\rtoken: 3e64e6302c7a475ead561c536e900dxz #emby令牌，获取方式看下面\rrewrite: #如果使用的是docker才需要，本机安装应该不需要\r- from: /00/00alpha/ #填写你本机00盘实际挂载的路径，但因为是docker，直接写docker映射的路径即可，更简单了\rto: /00/00alpha/ #容器内00盘的路径，如果不知道可以看下面\r"
+},
+{
+	"uri": "http://dxz.plus/posts/githubaction/",
+	"title": "GitHub Action 转存 Onedrive Google Drive 6盘",
+	"tags": ["Github", "action", "onedirve", "6盘", "转存", "googledrive", "gd"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "GithubAction新建workflow 感谢 jiegto 提供的flow\n可以在这里获取\n为了方便小白如我\n直接上图\n其中填入如下内容，注意改一下 gclone copy 那里， gclone copy命令 根据情况自己改\nname: OD 2 TD on: push: schedule: # 定时任务，每7小时运行一次 - cron: '0 */7 * * *' jobs: build: runs-on: ubuntu-latest if: github.event.repository.owner.id == github.event.sender.id env: GCLONE_CONFIG: ${{ secrets.GCLONE_CONFIG }} GCLONE_SA_DLURL: ${{ secrets.GCLONE_SA_DLURL }} steps: - name: Checkout uses: actions/checkout@v2 - name: gclone install run: | # 安装 gclone wget -qO- https://api.github.com/repos/donwa/gclone/releases/latest \\ | grep browser_download_url | grep Linux_x86_64 | cut -d '\u0026quot;' -f 4 \\ | wget --no-verbose -i- -O- | gzip -d -c \u0026gt; gclone sudo mv gclone /usr/bin sudo chmod +x /usr/bin/gclone - name: set accounts run: | # 配置 accounts 文件 cd ~ wget -O sa.zip \u0026quot;$GCLONE_SA_DLURL\u0026quot; unzip sa.zip - name: gclone config run: | # 写配置文件 mkdir -p ~/.config/rclone/ cat \u0026gt; ~/.config/rclone/rclone.conf \u0026lt;\u0026lt; EOF $GCLONE_CONFIG EOF - name: gclone run run: | # 延迟函数 delay() { random_time=$(($RANDOM % $1)) echo \u0026quot;等待 ${random_time} 分钟后开始同步\u0026quot; for((i=1;i\u0026lt;=${random_time};i++)); do echo \u0026quot;倒计时 $[${random_time}-$i] 分钟\u0026quot; sleep 1m done } # 随机延迟0~15分钟后再进行操作,可自行设置时间 delay 1 # 更改时区 sudo cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime # 开始同步 #gclone copy 6:dxz/tmp gc:{1fYHQxRIooVv85EEvLh_okBSmAVNdnooZ} --drive-server-side-across-configs -vvP --transfers 6 --drive-pacer-min-sleep=1s --cache-chunk-size 20M #echo \u0026quot;6已同步至gc\u0026quot; gclone copy gc:{1zcgxEktok7MWJ9SpTQtt4KTGHMccNQd5} dxz00asian01:asian --drive-server-side-across-configs --ignore-existing --transfers=4 -vvP echo \u0026quot;OD已同步至TD\u0026quot; 再来 Setttings-\u0026gt; secrets 添加几个参数\n主要是这两个\nGCLONE_CONFIG\tGclone 配置\nGCLONE_SA_DLURL\tservice_account 文件下载地址\n那个GCLONE_PATCH\t同步目录我没搞懂\n等大佬有时间，请教一下\n参考这里\n这里面 的 [gc] 可以写一堆，直接从rclone.config 文件复制即可，和上面的gclone copy命令对应，注意sa文件的路径，根据情况自己改\n这个 GCLONE_SA_DLURL 就直接把sa的文件夹放到能下载的地方即可，比如dropbox，然后做一个分享，保证 vps 里面能wget到就行\nvps已经配置好rclone的话，打包sa\nzip sa.zip /root/.config/rclone -r  一定注意保密sa！ 因为如果得到rclone 配置和sa文件的话，所有sa有权限的文件都可以看到 ！！！\n运行 点击 commit以后 就开始了\n然后到action里面 可以点击项目 看运行情况\n可以看到，速度尚可\n6盘限速了，大概能跑20M的样子\nOD也限速了，不过OD分地区，有的能跑35M左右，我这个新加坡的不行，10M 多\n可以看到，cron起作用了，运行了一小时 OD转GD有20M+\n最后强调一点\n别滥用！！！ 果然，惨遭封号！ 活该\n用来搬运的话还是买个无限流量小鸡吧，这个Action可以用来定时同步网盘或者其他更有意义的事情\nGit太难得，且用且珍惜吧\n"
+},
+{
+	"uri": "http://dxz.plus/posts/pmspackage/",
+	"title": "plex服务器刮削包提供",
+	"tags": ["PMS", "packege", "刮削包", "plex"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "PMS sharing project - scraperPackege\n助人助到底 PMS刮削包提供\n各位盆友，小年快乐！00新盘经过群内各路大神的帮忙，整理，刮削以及线路解析，脚本定制，终于和大家正式见面了。赶在现在正是为了给大家一周的时间调试，能够在春节和家人朋友一起分享。\n还是要感谢(排名不分先后) syqman，Terrance Siu， emengweb， D，Refrain， Syngnathz， Yc Amw ，mike ，why几位的热心帮助，费心耗时。 没有你们的帮忙就没有00新盘，替所有白嫖er感谢各位\n话不多说，提前给各位拜年了\n准备工作 挂载00新盘 挂载00盘的命令如下\ngclone mount origin: /root/rclone/00alpha --allow-non-empty --allow-other --vfs-cache-mode writes --dir-cache-time 2m --buffer-size 0M --vfs-read-chunk-size 128M --vfs-read-chunk-size-limit 1G --rc  \u0026ndash;dir-cache-time 2m ： 2分钟rclone刷新一次目录，同步云端更改到本地\n\u0026ndash;rc ： rclone的rc命令，比如强制刷新挂载目录：\nrclone rc vfs/refresh -vv --fast-list recursive=true --rc-addr=localhost:5572  gclone 安装以及nginx反代可以参考emeng大佬的文章还有大佬的gclone自动挂载\n创建PMS 其实就是新建一个PMS，然后把刮削好的包放里面\nDocker PMS\ndocker run --name=plex -e PUID=0 -e PGID=0 -e VERSION=docker -e UMASK=022 -v /root/disk/plex/config:/config -v /root/rclone:/00 -p 32400:32400 -p 3005:3005 -p 5353:5353/udp -p 8324:8324 -p 32410:32410/udp -p 32412:32412/udp -p 32413:32413/udp -p 32414:32414/udp -p 32469:32469 --device=/dev/dri:/dev/dri -v /root/disk/plex/transcode:/transcode --restart unless-stopped ghcr.io/linuxserver/plex  说明： awsJP的小鸡只有40g硬盘，需要挂载一个新硬盘，最小的是60G，挂载到 /root/disk 先\n这一步主要是为了拿到你 认领/claim 后的服务器 Preferences.xml 文件\n认领服务器参考这里\nPreferences.xml 文件位置在 /root/disk/plex/config/Library/Application Support/Plex Media Server/Preferences.xml\n然后备份该文件，该文件记录服务器各种信息，拿到别处，开一个docker就可以直接用，并且是已经认领过了，直接关联Plex账号，非常方便\n注：\nPlex免费账号即可创建PMS，客户端就要靠自己想办法了\n如果你的目录和我不一样 做相应更改即可。docker 嘛 ，及其任性\n先把认领好的docker PMS 停掉，准备解压大包\ndocker stop plex  解压刮削包 我把刮削包放到 00新盘的 scraper 目录下了\n挂载好以后 直接解压即可，这里是在awsJP的小鸡，把新增的60G硬盘挂载到 /root/disk\n那么解压命令就是\n tar -xvf /root/rclone/00alpha/scraper/plex00.tar -C /root/disk/  说明一下：\n这样挂载云解压接近40g的文件要几个小时，放到screen里面\nscreen -S packege tar -xvf /root/rclone/00/scraper/plex00.tar -C /root/disk/  /root/rclone目录映射到docker里面就是00 （目录名00是为了在PMS选取媒体文件夹时候00排最上，方便一点点）\n相应的00alpha就是00新盘的内容，00alpha你们自己随意起名字，只要映射到docker里面是00就没问题\n最后确认之前备份的Preferences.xml 文件位置在解压后的位置 /root/disk/plex/config/Library/Application Support/Plex Media Server/Preferences.xml\n几个小时之后，解压任务完成\ndocker start plex  VOILA\n电影就用plex默认的 plexmovie 刮削\n这个地方要注意一下 不要勾选 local resources，以强制读取媒体文件夹的poster\n不然就是这样\n\n是不是很贱啊\n其他剧集都用tmdb刮削\n这个刮削包不会经常更新，因为搞一次要好半天。你们都设置好以后 直接刷新整个库就行了，PMS会忽略已经刮削的内容，应该很快就会完成此包之后新添媒体的更新，节省时间/流量\n线路分析 为了让各位有更好的网络体验，Terrance Siu 大佬把目前国内个运营商的优化方案整理了一下 见图\n另外00新盘刚刚开始，还需要更新，扩充资源，如果有意愿加入贡献的朋友欢迎和本渣联系\n00盘所有内容永久免费分享，本着佛系，慵懒，永不做大做强的原则，欢迎各位学渣的加入白嫖\n申请加入00ALPHA\n注意按格式填写，否则不过\nEnjoy"
+},
+{
+	"uri": "http://dxz.plus/posts/sni/",
+	"title": "sni gost hosts 分流rclone",
+	"tags": ["sni", "rclone", "hosts", "gost"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "利用gost支持sni协议做简单rclone googleaip 分流 \u0026hellip;\u0026hellip;\n在 Terrance Siu (TS)大佬指点下，搞定了sni+gost+白名单\n本次折腾的主要意义在于：gost 支持 sni协议，可以快速搭建rclone文件下载通路，不用特意走梯子，对clash 分流等支持方便。 但是ip:443如果暴露，那么任何人都可以把相应服务解析至该IP。由于我们不是做公益，所以还要用白名单来控制访问\nvps搭建服务  更新一下软件\napt update \u0026amp;\u0026amp; apt install screen wget nano iptables procps curl nload iperf3 net-tools gnupg zip -y  首先是gost， 一键\nwget --no-check-certificate -O gost.sh https://raw.githubusercontent.com/KANIKIG/Multi-EasyGost/master/gost.sh \u0026amp;\u0026amp; chmod +x gost.sh \u0026amp;\u0026amp; ./gost.sh  然后假定443端口没有被占用,运行\ngost -L sni://:443  Done\n将以上写成服务，（TS大佬提供） nano /etc/systemd/system/rclone-sni@.service  内容为\n[Unit] Description=GO Simple Tunnel - a simple tunnel written in golang After=network.target [Service] Type=simple Restart=on-abort ExecStart=/usr/bin/gost -L sni://:%i [Install] WantedBy=default.target  直接运行\nsystemctl enable rclone-sni@443.service 即可启动vps 443端口作为sni服务\nsystemctl status rclone-sni@443.service 查看运行状态\nsystemctl restart rclone-sni@443.service 重启服务\n成功\n客户端设置  可以直接改hosts文件，添加如下内容到hosts文件里面\nVPS-IP www.googleapis.com VPS-IP oauth2.googleapis.com  当然，如果443端口呗占用，那么可以将上面443改成8443\n这种情况下无法使用hosts，只能用gost转发解决\ngost -L :8443 -F sni://VPS-IP:8443  不过这样的话，就不如直接用梯子了，哈哈哈😂\n将本地IP加入白名单 首先安装iptables\napt install iptables-persistent  记得保存之前的配置到 /etc/iptables/rules.v4\n然后修改 /etc/iptables/rules.v4文件\nnano /etc/iptables/rules.v4  做如下修改：\n*filter :INPUT DROP [0:0] #拒绝所有传入 :FORWARD DROP [0:0] :OUTPUT ACCEPT [0:0] -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT -A INPUT -i lo -j ACCEPT -A INPUT -s 1.2.3.0/24 -j ACCEPT #白名单ip 1.2.3.0换成你自己的IP -A INPUT -p tcp -m multiport --dports 22,32400 -j ACCEPT #白名单端口，用逗号隔开 COMMIT  1.2.3.0换成你本地的地址，允许访问所有协议\n22,32400 端口在这里所有ip都可以访问\n然后重启 iptables 让rules 生效\nservice netfilter-persistent start iptables-restore /etc/iptables/rules.v4  至此，sni+host+白名单搞定\n白名单很有用，自用vps的话还是很有必要的\n"
+},
+{
+	"uri": "http://dxz.plus/posts/tmm/",
+	"title": "tmm刮削简单说明",
+	"tags": ["tmm", "刮削", "tinymediamanager"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "tmm tinymediamanager 可以用docker版 本地， vps 皆可\ndocker run -d --name=tmm \\ -v /root/disk/tmm/config:/config \\ -v /root/rclone:/media \\ -e GROUP_ID=0 -e USER_ID=0 -e TZ=Europe/Madrid \\ -p 5800:5800 \\ -p 5900:5900 \\ -e ENABLE_CJK_FONT=1 \\ romancin/tinymediamanager:latest  老规矩 gd挂载的媒体库在 /root/rclone ,把她映射进 tmm的 media目录 注意开始选字体的时候要选中文字体 否则中文乱码 下图不是登录界面，但是注意登录的时候选中文字体\n下面是用TMM进行最简刮削 满足 emby plex 需求 TMM 刮削利器\n但是plex和emby也是刮削利器，二者需结合才是\nMovie设置 直接看图说话\nTmdb 的api自己注册账号免费获得\n这些图片如果选中，就会下载到媒体目录，这不是我们要的。\n我们要里面的url地址，这样 plex emby 刮削的时候非常快就回找到图片\n电影的重命名如下 文件夹名称\n文件夹\n${title} (${year})\n文件\n${title}.(${year}).${videoFormat}.${originalTitle}.${videoformat}.${filesize}\n文件夹名称就不要改了，这样识别率是最高的,而电影文件的这种命名可以提供更多信息，尤其搜索字幕的时候，同时可以保证多版本内容在plex下自动识别\n文件名字按自己喜欢来，有nfo会读nfo 剧集的刮削设置 剧集的命名\n文件夹\n${showTitle} (${showYear})\n季\nSeason ${seasonNr}\n文件\n${showTitle}.${showoriginaltitle}.S${seasonNr2}E${episodeNr2}.${title}.${videoformat}.${filesize}\n截图就不改了，按照上面的写就行了。主要还是文件夹名字正确就会识别\n都设置好以后，点更新源，右下角进度条走完。一定要走完，不然信息不全，就让小鸡自己跑几天吧\n刮削，由于只用tmm改名，因此速度会快一些，但还是会下载一部分文件\n下图挂载的google file stream 官方客户端。当然，用rclone挂载到vps是最好的\n开始刮削好以后，点击中文名称选择相应结果\n最后点重命名即可\n字幕选opensubtitle，自己免费注册一个账户，得到api填入即可\n由于改名是从TheMovieDB得到，因此Plex和Emby根据nfo去TheMovieDB读取数据，刮削就会非常准确快速，保证了刮削的成功率\n"
+},
+{
+	"uri": "http://dxz.plus/posts/pms/",
+	"title": "plex服务器集群 PMS cluster",
+	"tags": ["PMS", "cluster", "集群", "plex"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "PMS sharing project \u0026hellip;\u0026hellip; 这个中转真的很麻烦，发出来全当引玉了。。。丢人不怕，能帮到你就好 00盘复兴计划开始了，预计农历上线 主要内容还是和之前00盘类似\n提供小组搜集刮削成果，有PT大佬坐镇，资源从来不成为瓶颈\n提供emby完整刮削包\n提供plex完整刮削包\ndaocker 一键搭建\n所有资源依然是:\n永久免费\n永久续存\n永久更新\nUPDATE4: Caddy 2 Docker 其实可以自动签，前提是域名和ip做好解析。\n配置文件如下:\n\thz.dxz.plus { # tls /etc/caddy/certs/hz.dxz.plus.crt /etc/caddy/certs/hz.dxz.plus.key encode zstd gzip reverse_proxy * http://127.0.0.1:32400 { flush_interval -1 header_up Host 127.0.0.1 header_up X-Real-IP {http.request.remote.host} header_up X-Forwarded-For {http.request.remote.host} header_up X-Forwarded-Port {http.request.port} header_up X-Forwarded-Proto {http.request.scheme} header_up X-Plex-Protocol 1.0 } }  tls 后面的是自己签好的证书。docker caddy 默认自动acme签，所以这里面注释掉了。如果你有自己的证书，写好位置，去掉注视即可\n中转配置只要下面改成中转地址\nreverse_proxy * https://abc.dxz.plus header_up Host abc.dxz.plus  国外中转套cf CDN（开☁️）可能会加速；国内除非本地可以找到好的IP（比如湖南联通对应日本IP），否则不建议。\nUPDATE3: plex刮削包做好了，基于Bryan大佬的11PLUSVIP盘\n首先删除或者移动原来的plex文件夹，假设和我一样的设置\nmv /root/plex /root/plex1  准备至少大于40G的硬盘，然后将刮削包解压到本地任意目录\nwget https://share.dxz.plus/BlogContent/plex11.tar.gz tar -xzvf plex11.tar.gz /root/  再解压（注意此方法可能需要更多空间）\n或者挂载老00盘，直接解压到本地\ntar -xzvf /root/rclone/00/misc/plex11.tar.gz /root/  无论哪种方式，解压以后首先删除原来 plex docker\ndocker rm plex -f  然后重新启用 plexdocker\ndocker run --name=plex -e PUID=0 -e PGID=0 -e VERSION=docker -e UMASK=022 `#optional` -v /root/plex/config:/config -v /root/rclone/00:/00 -v /root/rclone/11:/11 -p 32400:32400 -p 32700:32400 -p 3005:3005 -p 5353:5353/udp -p 8324:8324 -p 32410:32410/udp -p 32412:32412/udp -p 32413:32413/udp -p 32414:32414/udp -p 32469:32469 -v /root/plex/transcode:/transcode --restart unless-stopped ghcr.io/linuxserver/plex  再用ssh反代到plex服务器，以认领服务器 连接ssh，浏览器输入 127.0.0.1:12345/web 即可看到登录界面，登录自己的plex账号即可认领\nplex认领服务器账号不需要高级版，有播放器即可播放服务器内容，播放器自己想办法吧。。。\n00盘将会免费提供 Plex 和 Emby 刮下包，尽量拣取精华内容，将压缩包控制在20G以内。供弱鸡使用。\n当然，大全版本也会有，不能枉费了兄弟们收藏的辛苦💦\nUPDATE2: 突然想起，gost 可以作为中转，转发PMS的32400端口，经过 @terrancesiu 大佬的确认，没问题\ngost 安装参考上篇教程，或者自行谷百\n在PMS网络设置填写中转鸡ip https:x.x.x.x:32436 中转鸡gost， 一条命令搞定\ngost -L=:32436/3.114.136.xxx:32400  也可以用gost 一键脚本 或者 直接在中转鸡和PMS鸡之间建立gost隧道\nPMS gost -L tcp://:32401/127.0.0.1:32400 观察网络情况，成功以后直接 nohup gost -L tcp://:32401/127.0.0.1:32400 /dev/null 2\u0026gt;\u0026amp;1 \u0026amp;\n中转鸡 gost -L tcp://:32400/54.246.19.xxx:32401 同理成功后用 nohup\n如此一来可以彻底关闭PMS鸡的web界面，改用32401的gost隧道。应该更加安全\n同时中转鸡反代到本地127.0.0.1:32400会直接到PMS小鸡，可以利用CF的免费https证书\n嗯，应该是很完美了（除了两🐔之间无法像emeng那样白嫖CF的CDN，如果有需要就上nginx吧）\nUPDATE: 目前两种反代方案： caddy 和 nginx\nnginx 性能好，可以走cf，推荐：\nemengweb大佬针对不同人群的两篇教程 小白和进阶\ncaddy 性能差，无法cf, https正常（其实是我没搞清楚，期待大神指点）\n本次更新主要介绍caddy。后面的zerotier组网不适合分享，随便看看吧。\n获取 Cloudfalre API 令牌，教程很多，自行谷百吧\n设置PMS（一下操作再PMS小鸡，工作鸡，aws 爱尔兰🇮🇪） 先安装go\nwget https://dl.google.com/go/go1.14.linux-amd64.tar.gz tar -C /usr/local -xzf go1.14.linux-amd64.tar.gz export PATH=$PATH:/usr/local/go/bin go version apt install git -y go env -w GO111MODULE=\u0026quot;auto\u0026quot; apt install git --force-yes -y go get -u github.com/caddyserver/xcaddy/cmd/xcaddy caddy git clone https://github.com/caddyserver/xcaddy.git cd xcaddy/cmd/xcaddy go build ./xcaddy build master --with github.com/caddy-dns/cloudflare  如果内存报错 用下面脚本增加虚拟内存\nwget https://www.moerats.com/usr/shell/swap.sh \u0026amp;\u0026amp; bash swap.sh  安装完毕以后 运行\n./caddy list-modules | grep dns  出现\ndns.providers.cloudflare  成功！\nmv caddy /usr/local/bin/  工作鸡搭建 Caddy V2 用于反代本地 127.0.0.1:32400\nCaddy 配置文件\nmkdir /root/caddy nano /root/caddy/Caddyfile  写入如下内容，自行替换相关地址\nawsirplex.wedxz.com { tls { dns cloudflare 7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX } reverse_proxy 127.0.0.1:32400 { header_up Host {http.request.host} header_up X-Real-IP {http.request.remote} header_up X-Forwarded-For {http.request.remote} header_up X-Forwarded-Port {http.request.port} header_up X-Forwarded-Proto {http.request.scheme} header_up Connection {http.request.header.Connection} header_up Upgrade {http.request.header.Upgrade} } }  其中： awsirplex.wedxz.com : PMS小鸡\n安装 docker，脚本 ：\nsudo apt-get update -y curl -fsSL get.docker.com -o get-docker.sh sudo sh get-docker.sh  plex docker\ndocker run --name=plex -e PUID=0 -e PGID=0 -e VERSION=docker -e UMASK_SET=022 `#optional` -v /root/plex/config:/config -v /root/rclone/00:/00 -v /root/rclone/11:/11 -p 32400:32400 -p 32700:32400 -p 3005:3005 -p 5353:5353/udp -p 8324:8324 -p 32410:32410/udp -p 32412:32412/udp -p 32413:32413/udp -p 32414:32414/udp -p 32469:32469 -v /root/plex/transcode:/transcode --restart unless-stopped -e PLEX_CLAIM=claim-ThZQptYV6jZ3VmXa93of ghcr.io/linuxserver/plex  其中： PLEX_CLAIM=claim-ThZQptYV6jZ3VmXa93of ： 可以在 plex官网获取。\n-p 32400:32400 : emeng 大佬说可以用 -p 127.0.0.1:32400:32400 替换， 更加安全。但还是建议先用 上面的，等plex安装设置完成以后 再 删掉 plex docker stop plex docker rm plex （不要删配置文件） 在重新 docker run 上述命令（改一下 -p 127.0.0.1:32400:32400 ） 即可。\n-v /root/rclone/00:/00 ： 也可以直接映射 -v /root/rclone:/00\n这样挂载再rclone目录下的 多个网盘可以再docker 里面的00目录下，方便一点点。但是之前不这么干是因为 plex 支持3层目录，Bryan的剧集四层目录。需要分开\n输入 IP:32400 可以进入设置，登录 生成 claim的账号 直接认领服务器。\n在设置里面先关\n远程连接再设置一下网络\n网络设置Custom server access URLs 那里要加上中转鸡的域名\nPMS鸡是 http://awsinplex.wedxz.com/,https://awsirplex.wedxz.com/\n中转鸡是 https://awsinplex.wedxz.com/\n关闭转码，防止小鸡过劳\n设置中转鸡（以下操作再 aws 印度🐔） 其他和上面PMS基本一样，并且中转鸡只需要安装 Caddy V2 即可\n配置文件：\nmkdir /root/caddy nano /root/caddy/Caddyfile  内容\nawsinplex.wedxz.com { tls { dns cloudflare 7XXXXXXXXXXXXXXXXXXXXXXXX } reverse_proxy 54.246.19.204:32400 { header_up Host {host} header_up X-Real-IP {remote_host} header_up X-Forwarded-For {remote_host} header_up X-Forwarded-Proto {scheme} } }  其中\n7XXXXXXXXXXXXXXXXXXXXXXXX : Cloudfalre API 令牌\n54.246.19.204:32400: PMS的IP\nawsinplex.wedxz.com: 中转鸡域名\nPMS🐤可以开CF CDN保护（白嫖加速）\n中转🐔不开保护\n这是emeng的新泽西小鸡效果\n 这是学渣的Gcore中转awsJP\n 这是本次写博客搭建的PMS@sws爱尔兰 via aws孟买，速度明显不及 上面两个，需要更快的中转鸡才行\n 更新结束\n哋哔哋 简单说下 PMS cluster 思路： PMS 就是plex media server， 一款收费媒体播放系统 和emby差不多。但是体验下来，略胜一筹。cluster就是集群，这里是把多人的plex server 共享粗来，利用zero-tier内网功能， 实现远程串流vps媒体内容，集高画质，超流畅，暴拉轰于一体\n注册zero-tier 教程n多，不重复造轮子了。 得到 密钥即可\nVPS安装zero-tier 还是脚本 root权限运行：\ncurl -s https://install.zerotier.com | bash  安装好以后，根据各种教程继续走，加入zero-tier\nzerotier-cli join 6ab56xxxxxxxxxx\nzero-tier 内网 跟其他教程走即可，此处简略：\n建立内网后，把各个vps的docker 内网加入 zero-net路由\n注意要和和vps的docker内网对应 如果多个内网冲突，改一下docker内网\nnano /etc/docker/daemon.json  内容是\n{ \u0026quot;bip\u0026quot;:\u0026quot;172.xxx.0.1/24\u0026quot; }  重启docker\nsystemctl restart docker  网络准备完毕\nPMS docker docker run --name=plex -e PUID=0 -e PGID=0 -e VERSION=docker -e UMASK_SET=022 `#optional` -v /root/plex/config:/config -v /root/rclone/00:/00 -v /root/rclone:/0000 -p 32400:32400 -p 1900:1900/udp -p 3005:3005 -p 5353:5353/udp -p 8324:8324 -p 32410:32410/udp -p 32412:32412/udp -p 32413:32413/udp -p 32414:32414/udp -p 32469:32469 -p 32700:32400 -v /root/plex/transcode:/transcode --restart unless-stopped --device=/dev/dri:/dev/dri -e PLEX_CLAIM=claim-000000000000000000 ghcr.io/linuxserver/plex  其中要说明的是：\n/root/rclone是你gdrive的挂载目录，这里要是00盘的话可以直接这样写，同时可以读取多个/root/rclone下的挂载目录，如11盘的话，由于PMS目录只支持3层，那么就要直接映射 -v /root/rclone/11:/11,否则无法选择剧种\n-e PLEX_CLAIM=claim-000000000000000000 是认领你的PMS。由于vps不在本地，所以ssh 反代认领，或者是 docker run的时候认领，这样等到docker运行1分钟完全生成服务器的时候，登录生成claim的PMS账号即可直接认领该服务器\n\u0026ndash;net=host 这样写的话，会把整个vps内网加入zerotier，可能会有一定风险；同时127.0.0.1也不便于zero-tier路由分配。另外建议加入cluster的VPS都改成证书登录，并且证书 目录不要映射到 PMS里\nclaim 密钥在这里 获取，登录PMS账号生成\n在家里面，如果有OpenWRT的话，自带zero-tier, 在VPN那里配置。输入 加入zero-tier的密钥即可\n手机端如果在OpenWRT 环境外串流（direct play 或者 copy play），也要首先加入zero-tier，但是有个小坑：无法开小火箭了。好在zero-tier全平台，这也是首选她的原因之一\n手机如果4G连网还要设置默认的远程播放属性，来串流 这是甲骨文小鸡，手机4G串流4K 23G的《异形》,串流服务器没压力，注意改ac3音频，压力更小\n 等小伙伴们的服务器都搭建好以后，互相加入好友，即可分享自己的PMS。同时大家又都在一个内网下，串流即可。当然前段时间电信升级了100m上传，也别忘了拿出来一用 以上就是简要的过程，如有不清楚的可以留言，也可以进群讨论。\n常坑  docker PMS启动 看不到认领： 等一会儿在 打开网页，或者 删除docker PMS，注意要删除 /root/plex/config下的所有文件，重新运行docker run。（ docker真是太任性了！！）   "
+},
+{
+	"uri": "http://dxz.plus/posts/gost/",
+	"title": "gost套娃socks5",
+	"tags": ["gost", "套娃", "socks5"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "回来真好 \u0026hellip;\u0026hellip; 各位学渣，本渣回来啦\n谷歌TD凉了，虽然没凉透，但明显不如过去了，限制很多。没办法，纯是玩儿死的。\n毕竟苦BAT久矣的内渣们，见到谷歌这种不限速，不限流量，近乎免费的服务，是不可能有任何抵抗力的。\n离开一段时间，甚是想念各位。\n前几天Cloudflare给我发邮件，把dxz.plus这个域名停止服务了，可能是由于之前分享的资源被大量下载导致。发邮件，回复：自己会解封。\n很好。\n今天放假，搞了一下gost，挺神奇，把之前140m的小鸡 拉到 240m\ngost前 gost后 简单说下思路：\n国外鸡和本地nas建立gost隧道，这里面演示的其实就是最简单的端口转发功能，只不过这个gost可以加密，然后也不用ss了，我选一个更简单的socks5，毕竟docker方便，一键搞定。 如果在外面用手机呢，当然也可以，ddns回家，链接家里的相应端口即可。ss配合tls还是比较稳的，知识caddy2 出来 caddy1的脚本不灵了，不过没关系，过几天把2的补上。 这个gost没经历什么考验，暂时不说稳定性，但是提速是实打实的\n既然是小白专用，肯定是脚本先行\n一键gost wget --no-check-certificate -O gost.sh https://raw.githubusercontent.com/KANIKIG/Multi-EasyGost/master/gost.sh \u0026amp;\u0026amp; chmod +x gost.sh \u0026amp;\u0026amp; ./gost.sh  docker socks5 在vps上面，相对于本地nas来说，是 “落地🐔”\ndocker run -d --name socks5 -p 1088:1080 -e PROXY_USER=dxz -e PROXY_PASSWORD=dxz serjs/go-socks5-proxy  这个结果是，用socks5客户端连接的时候，添VPS IP， 用户名 dxz 密码 dxz\nVPS运行 gost 服务端 nohup gost -L=socks5://:1089/127.0.0.1:1088 /dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  把客户端的1089请求转到本地socks5 docker 的1088端口。测试的时候可以不用nohup，可以看看连接情况，是否有问题之类的\ngost -L=socks5://:1089/127.0.0.1:1088  如果有问题，就 pkill gost， 干掉gost进程，再搞\n客户端 我这里是本地NAS虚拟的Debian10\nnohup gost -L=:1090 -F=socks5://x.x.x.x:1089?notls=true /dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  把本地1090端口转发到x.x.x.x的1089端口，用socks5 协议\n同样可以先去掉 nohup 和 /dev/null 2\u0026gt;\u0026amp;1 \u0026amp; 运行 看结果\nupdate: 怕 socks5 被咔擦的 可以用tls加密， 其他不变\nVPS gost -L=socks5+tls://:1089/127.0.0.1:1088\n客户端 gost -L=:1090 -F=socks5+tls://x.x.x.x:1089\n连通以后可以nohup\nV P S: nohup gost -L=socks5+tls://:1089/127.0.0.1:1088 /dev/null 2\u0026gt;\u0026amp;1 \u0026amp; 客户端: nohup gost -L=:1090 -F=socks5+tls://x.x.x.x:1089 /dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  速度差不多\n23:00 测速 这是speedtest 直接socks5 gost+socks5 这是YouTube 4k 8W 全蓝， 比傍晚时候 9W 全蓝 略低\n这是看70G 信条，76.41/2.5/3.6 = 8.49 MB/s 姑且认为是常见4k remux版本的极限吧，平时我看的最多的还是 1080p，或者 2X.XX G 的4k：电视太差 看不出差别\n 小鸡用的就是 aws lightsail 的新加坡节点 最低配 3.5刀\n白名单 如果担心安全性的话，aws可以在控制台里面很方便的添加白名单，把自己常用的ip/段 加进去就好了。我加了 123.123.0.0-123.456.255.255 这样的进去，有效性有待考证\n"
+},
+{
+	"uri": "http://dxz.plus/posts/notice/",
+	"title": "暂时离开一段时间",
+	"tags": ["公告", "telegram", "群组", "茶先生", "影视库"],
+	"categories": [],
+	"series": [],
+	"description": "酷冷至尊",
+	"content": "个人的一点私事，是在抽不开身，短时间内也限制TG，博客暂停更新\n开博客几个月了，成天成宿的各种搞事，是真的爽，但是最后还是搞出事了。当然是我自己的私人问题，就不分享出来了\n00盘之前和茶先生的合并了，主要跟着茶先生的私人盘骗吃骗喝，但是，好景不长（tm这句成语说出来准没好事儿）好日子结束了。 00盘只好自己动手了。鉴于自己目前的时间分配，是真的精•力•不足。就拜托TG群里的兄弟了。做到最好必然很难，但尽力做到自己满意，还是有可能的，毕竟自己满意这门槛，真的不能再低了\n加入00盘其实就在博客最下了，细心的同学早就看到了(反正我不是细心的同学)。点G+可以自助加入\n进tg讨论组，找BRYAN大神\n青山常在，绿水长流，兴犹未尽，必会回来\nTHIS DEFINITELY IS NOT THE END OF IT, IT\u0026rsquo;S A BEGINNING OF A NEW START FOR SURE\n"
+},
+{
+	"uri": "http://dxz.plus/posts/snap2html/",
+	"title": "snap2html linux 定时推送 github",
+	"tags": ["snap2html", "github", "linux", "茶先生", "影视库"],
+	"categories": [],
+	"series": [],
+	"description": "酷冷至尊",
+	"content": "新年好 Snap2Html 是真的好用，B格高高的\nlinux版本功能基本也都有了，可以部署在小鸡上面自动运行\n在茶先生和panini的帮助下，终于实现了标题\n其实一开始不想折腾，资深小白都有体会：各种奇奇怪怪得坑只能google搞定，一想到google百八十遍的，心就累\n不过最后还是手欠，没忍住\n好在算是支吧起来了，怕忘了，记录一下\npython环境安装 python env install 这是最难的，如果安装好python环境，你就成功一半了。\nThat\u0026rsquo;s the crucial part and when it is done, you are already halfway through\nNONAME童鞋给了一个详细安装步骤，在此表示感谢。大家可以按照他的步骤试着部署一下python环境，不行在google\n下载linux版snap2html mkdir /root/snap2html cd /root/snap2html wget https://github.com/ZapperDJ/DiogenesList/archive/master.zip unzip master.zip cd /root/snap2html/DiogenesList-master/  原来的脚本有一点点小坑，我爬过了，如果你也遇到麻烦了，也可以先试试我改过的脚本\n开扫00盘 cd /root/snap2html/DiogenesList-master/ python /root/snap2html/DiogenesList-master/diogeneslist.py /root/rclone/00 index  我把00盘挂载到了/root/rclone/00 根据自身情况相应调整\nGitHub上面创建一个仓库，比如htmltest，在settings里面有个GitHub Pages选项 添加你的域名 需要注意的是如果不给添加 那就试试先向你的仓库随便添加一个index.html文件先\n然后去dns解析的地方添加一个CNAME\n准本工作结束\n安装git 连接到仓库 apt install git mkdir /root/snapGit cd /root/snapGit git init git remote add origin https://github.com/你的git账户/htmltest.git git pull origin master  git登陆免输入密码 cd /root/snapGit git config credential.helper store git add . git commit -m 'test' git push -u origin master  第一次需要输入用户名/密码 第二次就不用了\n改一些设置，并推送到gitbut 等待扫完00盘以后，把扫过的文件复制到当前仓库，并推送到github 脚本如下\nnano /root/snapGit/snap.sh  内容为\n#!/bin/bash #cd /root/snap2html/DiogenesList-master/ #python /root/snap2html/DiogenesList-master/diogeneslist.py /root/rclone/00 index sed -i \u0026quot;s#\\[LINK ROOT\\]#https://media.dxz.plus#g\u0026quot; /root/snap2html/DiogenesList-master/index.html sed -i \u0026quot;s#\\[LINK PROTOCOL\\]##g\u0026quot; /root/snap2html/DiogenesList-master/index.html sed -i \u0026quot;s#\\[SOURCE ROOT\\]##g\u0026quot; /root/snap2html/DiogenesList-master/index.html sed -i \u0026quot;s#\\\\\\\\\\\\\\root\\\\\\\\\\\\\\rclone\\\\\\\\\\\\\\00##g\u0026quot; /root/snap2html/DiogenesList-master/index.html sed -i \u0026quot;s#1\u0026gt;index#1\u0026gt;所有内容均来自公开分享_收藏自用_侵权联系https://t.me/dxb22abad(telegram)#g\u0026quot; /root/snap2html/DiogenesList-master/index.html sed -i \u0026quot;s#e\u0026gt;index#e\u0026gt;00盘_用法详见dxz.plus#g\u0026quot; /root/snap2html/DiogenesList-master/index.html cp /root/snap2html/DiogenesList-master/index.html /root/snapGit/ cd /root/snapGit git add . git commit -m 'snap2htmlDailyUpdate' git push https://github.com/你的git账号/htmltest.git  这时候访问你的gitpages应该就可以看到生成的html了 比如mrt.dxz.plus/index.html\n剩下的就是加入启动脚本，每天执行(注意把上面snap.sh脚本的两个注释#去掉)\nchmod +x /root/snapGit/snap.sh nano /etc/crontab  最下填入\n0 3 * * * root /root/snapGit/snap.sh  这里设置的每天凌晨3点执行，由于我还没试行不行呢，所以，先呵呵好了\nUpdate Jan 24, 2020 at 12:01:15 PM 经测试，定时在vps上面执行上述脚本，自动将生成index.html文件上传GitHub更新，并保留历史版本 Viola"
+},
+{
+	"uri": "http://dxz.plus/posts/embyconfig/",
+	"title": "Emby Docker 数据库操作",
+	"tags": ["docker", "emby", "rclone", "entertainment", "娱乐", "plex", "gdrive", "网盘", "谷歌", "server"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "介绍 Docker Emby方便之处不仅仅是容易搭建，连数据库转移也非常容易。\n#简单记录 参见前面Docker Emby用法的介绍，把emby/config和/root/rclone/ldfdsa00两个目录保持映射一致就可以实现vps之间emby数据库无痛转移。由于 docker 里面的结构是一样的，不需要我们操心。外面目录映射的原文件夹不管在哪儿都可以。给迁移数据带来极大的方便。等把00盘原来内容和茶先生的内容扫完，数据文件也共享出来，可以放到任何搭建好的新emby server里，按照如下操作，就可以恢复。并且自用的话，只需要删除/添加一下登陆用户就可以了\n原数据库操作 以下都是按照之前文章的挂载操作，根据需要做相应改变\ndocker stop emby apt install zip -y cd /root/emby zip config.zip ./config -r  目标数据库操作 之后把文件转移到目标VPS或者本地NAS，并拷贝到/root/emby目录下\ndocker stop emby apt install zip -y cd /root/emby unzip /root/emby/config.zip docker start emby  去新vps打开相关网页即可 域名和IP都可以。域名如果按照之前教程，直接走CDN\n效果 美西小鸡emby 目标小鸡emby update 利用自建/900SA账号挂载Jan 11, 2020 at 10:49:49 AM 参考这里\n适合暂时没有搞定自己的SA Group，想马上扫00盘/茶先生盘的童鞋\n其实也可以一直用，100个SA，随便选一个挂上，即插即用\n00盘用法Jan 5, 2020 at 9:06:54 PM Jan 15, 2020 at 3:52:38 PM Jan 16, 2020 at 11:28:11 AM 更新了/root/emby/config目录压缩包，自己替换\nJan 28, 2020 at 6:02:26 PM 更新了00盘的刮削内容\n如果和我的目录设置一样的话，可以复制粘贴以下命令\ncd /root/emby docker stop emby rm ./* -r wget https://share.dxz.plus/BlogContent/embyconfig.zip unzip embyconfig.zip docker start emby  Feb 2, 2020 at 12:37:53 PM 更新了挂载00盘的操作 方便小白\nFeb 5, 2020 at 10:29:18 PM vps上面搭server，配置差的，比如我用的这种。一定要关闭转码播放，不然emby擅自转码，小鸡很容易自爆 以上为更新内容\n=======================================================\n继续教程\nrclone挂载，embydocker映射也和我的一样的话，下面命令\ndocker stop emby cd /root/emby rm config/ -r wget https://share.dxz.plus/BlogContent/embyconfig.zip unzip embyconfig.zip docker start emby  justhost小鸡对联通不错，就是硬盘太小，只能把图片/字幕/nfo存GD，扫00盘\n已经扫好的内容在此。解压并替换你挂载的emby的config目录，登陆dxz，改名，加密码。\n00盘在embyDocker内的目录结构为/00只要把00盘整个映射给/00\nrclone挂载参考\n rclone mount dxz: /root/rclone/00 --allow-non-empty --allow-other \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  docker pull命令参考：\ndocker run --name=emby -d -v /root/emby/config:/config -v /root/rclone/00:/00 --net host -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  这个和之前的配置基本一样，把00盘挂载到 /root/rclone/00 再映射给dockerEmby的00目录\n所有影剧目录设置不用改，除了字幕之外都可以不选 如果茶先生又更新，点击扫描资料库等待完成（先等我更新完00盘再扫）\n整个扫完config的目录大小为106.77m，压缩包276m。5g的vps空间出去1G的缓存还剩2.1G，如果不做他用的话，再装50000部电影应该没有问题 由于整理影剧的工作都由茶先生牵头的小分队完成，我只是简单点几下识别，你的挂载只需要读取nfo就可以了，基本不会耗费什么流量。\nJust Enjoy, Really\n高级折腾，以茶先生共享盘为例 先搞定emby server 茶大已经把教程写好了，照做就OK。但是我的小鸡zip解压中文出问题，自己打包了一下。\n还是引用一下:\n 总结一下执行步骤 ：\n  先确保关闭emby服务，sudo service emby-server stop\n  删除/metadata/，/root/，/cache/，三个文件夹，以及/data/目录下的 library.db library.db-shm library.db-wal 三个文件， (emby目录一般在 var/lib 内，如果是docker搭建的，就在你自己配置的目录内)\n  下载Zip包解压文件到对压存放位置：\n  emby/data/library.db emby/metadata/ emby/root/ emby/cache/ emby/data/collections/\n 然后chown一下上面的文件， 999/998,（视你自己主机而定）  chown 999:998 /var/lib/emby/data/library.db chown -R 999:998 /var/lib/emby/metadata/ chown -R 999:998 /var/lib/emby/root/ chown -R 999:998 /var/lib/emby/cache/ chown -R 999:998 /var/lib/emby/data/collections/\n着改一下媒体库的路径 编辑Emby/root/default/电影/options.xml 文件 把里面的\u0026lt;Path\u0026gt;L:\\私人库\\剧集\\电影\u0026lt;/Path\u0026gt;  改成\u0026lt;Path\u0026gt;/home/私人库/剧集/电影\u0026lt;/Path\u0026gt; \n 再Rclone挂载到指定目录：/home/私人库/  rclone mount gdrive: /home/私人库 \u0026ndash;巴拉巴拉巴拉\n 最后重启emby服务：sudo service emby-server start 即可   不过其实上面是过程，知道怎么回事就行了。直接把我打包的文件夹替换emby的config文件夹 然后执行\nchown 1000:users /var/lib/emby/data/library.db chown -R 1000:users /var/lib/emby/metadata/ chown -R 1000:users /var/lib/emby/root/ chown -R 1000:users /var/lib/emby/cache/ chown -R 1000:users /var/lib/emby/data/collections/  上面的 1000:users 改成你自己的\n到原来config 目录 随便选一个文件\nls -ld filename  就可以查到对应owner\n再设置一下rclone挂载 其实用docker的话，rclone挂载在哪儿都无所谓，只要emby docker 拉取镜像的时候添加一个文件夹映射就可以了\ndocker run --name=emby -d -v /root/emby/config:/config -v /root/rclone:/clone -v /root/rclone/MrT:/home/私人库 --net host -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  上面是把茶大的盘挂载到了/root/rclone/MrT 映射到docker里面为/home/私人库\n搞定以后 docker start emby启动embyserver，自己把dxz用户删掉 改成自己用户 加上密码就算齐活儿\n演示 刚刚弄好的，用kodi 的emby插件，可以顺畅1080P。\n 茶大的盘好就好在没有4k，小鸡和带宽压力瞬间变小。不过还是期待高峰表现。 实时vps embyserver 同步 群友@terrancesiu大佬介绍新方法，可以实时同步更新\n大意(我理解，还没试)就是利用dropbox提供的增量同步，实现两个VPS之间数据实时更新，这样就可以完全自动化，连转移目录都省了\n留个小坑，等试验成功的\nrsync 同步embyserver资料库 docker版本 安装rsync\napt install rsync  在docker的embyserver搞定以后，先停止server\ndocker stop emby  然后进入任意位置建立同步排除文件(夹)列表，我这里放在/root/emby文件夹下\nnano /root/emby/exclude.txt  然后填入如下内容，根据你的情况作相应更改，如果和我配置一样，就不用改\ndata/authentication.db-* /logs /home/dxz/emby/config/logs /home/dxz/emby/config/config /home/dxz/emby/config/root /home/dxz/emby/config/plugins /home/dxz/emby/config/transcoding-temp data/users.db* data/library.db-* data/devices data/activitylog.db-* data/ScheduledTasks cache  然后进行rsync同步\nrsync -uavzP dxz@129.146.46.134:/home/dxz/emby/config/ /root/emby/config/ --exclude-from '/root/emby/exclude.txt'  中间会提示输入密码:dxz /root/emby/config/目录是docker的emby/config目录，'/root/emby/exclude.txt'是排除文列表，根据需要更改，其他不用动\n第一次几乎要把5G多的东西从我的小鸡下载到你的小鸡（或者是做对比，具体我也不知道），由于我上传只有40m，所以要很久。之后就会快，2分钟以内可以搞定\n之后删掉一个文件\nrm /root/emby/config/library.db-wal  再重启emby\ndocker restart emby  这个方法有个缺点，无法保留一些自定义设置和播放记录。如果茶先生有更新的话，他会把更新内容整理好放出来。当然，你的embyserver如果和茶先生设置一致的话，她会自行发现并刮削新增内容，虽然速度慢，但是全自动，按照相应规则应该可以刮削出来。茶先生有大的更新，那就只能在我的小鸡更新以后再同步一遍\n其实可以再embydocker搭建完成就直接rsync演示🐔的配置文件，但是由于我设置了管理员密码，所以到了本地只有dxz这个演示用户可用。所以才有上述添加排除列表的需求\n另外也可以用docker版的dropbox来做增量同步，但是那样的话需要用dropbox账户，并且每次授权都要dropbox所有者确认，比较麻烦，所以暂时先不做实验了，如果dropbox效果优于rsync的话，会更新。毕竟rsync也是增量同步，第二次以后的同步会很快\n直装版本 Forwarded from 茶先生  安装运行Verysync，（感谢emeng推荐）\nVerySync 密匙 ：B3APU22XOPA3TOYUKHWHL47MFGN4SXVX24H7VIFC36TLCL3CAK7KFU4\n添加这个密匙后会开始同步我的emby整个文件夹，P2P速度很快\nWindows到这就结束了，同步完后就直接用就行了\n用Raidrive把私人库挂载到L盘即可（必须L盘）\n这样一来，只要保持verysync后台运行，就能一直同步更新\n哦 对了 emby默认账号密码\nOldGoodGuy diudiu\n Forwarded from 茶先生  Linux第一次使用需要一些操作\n我们先设置Verysync同步文件到/home/emby/文件夹下\n同步完之后，进入Emby后台设置\n设置-缓存路径-/home/Emby/programdata/\n媒体库 -高级-设置资料文件夹：/home/Emby/programdata/\nprogramdata文件夹给写入权限，保存后关闭Emby\nsudo service emby-server stop 替换以下文件夹\ncp -r -f /home/Emby/programdata/Linux/root /var/lib/emby cp -r -f /home/Emby/programdata/data/collections /var/lib/emby/data 删除替换数据库文件，并修改用户组为emby:emby不改无法启动）\nrm /var/lib/emby/data/library.db-shm rm /var/lib/emby/data/library.db-wal cp -r -f /home/Emby/programdata/Linux/library.db /var/lib/emby/data chown -R emby:emby /var/lib/emby/data/library.db (注意emby:emby需要改成你自己的emby所属用户组，看同文件夹内其他文件是什么用户组，就改那个） 重启Emby即可\n之后rclone务必挂载团队盘到 /home/私人库/内， 不然数据库无法关联到媒体文件，无法播放 例如：\nrclone mount gdrive: /home/私人库 \u0026ndash;巴拉巴拉巴拉 如果需要挂载到别的路径，自己修改数据库\n重启Emby，大功告成\n以后每次更新，因为所有资料夹文件都会自动同步，因此只需要替换数据库即可 一次性运行以下命令\nsudo service emby-server stop rm /var/lib/emby/data/library.db-shm rm /var/lib/emby/data/library.db-wal cp -r -f /home/Emby/programdata/Linux/library.db /var/lib/emby/data chown -R emby:emby /var/lib/emby/data/library.db sudo service emby-server start ####Update:Jan 24, 2020 at 12:14:33 PM Q:用very sync同步完Emby后，结果打开本地的emby网页提示拒绝访问 A:这是因为网页同步到了以下这些数据库的临时文件造成的\n\\Emby\\programdata\\data\\activitylog.db-shm \\Emby\\programdata\\data\\activitylog.db-wal \\Emby\\programdata\\data\\authentication.db-shm \\Emby\\programdata\\data\\authentication.db-wal \\Emby\\programdata\\data\\displaypreferences.db-shm \\Emby\\programdata\\data\\library.db-shm \\Emby\\programdata\\data\\library.db-wal \\Emby\\programdata\\data\\users.db-shm \\Emby\\programdata\\data\\users.db-wal 删除这些文件后再运行就行了。 那么如何防止这个现象再次发生呢？\n只需添加过滤规则即可 打开VerySync网页，右键你的Emby文件夹-忽略文件列表\n输入 emby 过滤列表 防止出现访问拒绝问题 (?d).db- 如果想保留自己建立的用户和观看进度，则继续添加以下代码后保存即可 #保留自己建立的用户和观看进度 (?d)users.db* (?d)authentication.db* (?d)activitylog.db* (?d)displaypreferences.db* 这样，以后就不会出现拒绝访问的问题了。  verysync docker操作 这里吧verysync的目录设为/home/dxz/MrT（根据需要自己更改）EmbyserverDocker目录设为/home/dxz/emby/config\nverysync同步完之后，进入Emby后台设置\n设置-缓存路径-/home/dxz/MrT/programdata/\n媒体库 -高级-设置资料文件夹：/home/dxz/MrT/programdata/\nprogramdata文件夹给写入权限，保存后关闭Emby\ndocker emby stop  替换以下文件/夹\nrm /var/lib/emby/data/library* cp -r -f /home/dxz/MrT/programdata/data/collections /home/dxz/emby/config/data/collections cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata cp -f /home/dxz/MrT/programdata/Linux/library.db /home/dxz/emby/config/data/ chown -R 1000:users /home/dxz/emby/config/data/library.db  (注意1000:users需要改成你自己的emby所属用户组，看同文件夹内其他文件是什么用户组，就改那个）\n之后rclone务必挂载团队盘到/home/私人库/内，不然数据库无法关联到媒体文件，无法播放,由于是docker，改下pull命令就可以了\ndocker stop emby docker rm emby docker run --name=emby -d -v /home/dxz/emby/config:/config -v /root/rclone:/clone -v /root/rclone/MrT:/home/私人库 --net host -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  以后每次更新，因为所有资料夹文件都会自动同步，因此只需替换数据库文件，一次性运行以下命令\ndocker stop emby rm /home/dxz/emby/config/data/librar* cp -r -f /home/dxz/MrT/programdata/cache /home/dxz/emby/config/cache cp -r -f /home/dxz/MrT/programdata/data/collections /home/dxz/emby/config/data/collections cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata cp -r -f /home/dxz/MrT/programdata/Linux/library.db /home/dxz/emby/config/data/ chown 1000:users /home/dxz/emby/config/data/library.db docker start emby  之所以重复拷贝cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata是因为verysync付费版本才可以选择目录，这一点不如rsync实在，不过已经很方便了。稍微浪费一点点磁盘空间。\n目前正在扫00盘里的茶先生电影备份，nfo和图片字幕都存到gdrive了。所以可以像之前00盘的用法一样，直接扫。优点是几乎不占用vps空间，缺点嘛，打开emby载入图片稍微慢一点（速度取决于vps的google的速度）\n另外茶先生正在做00盘并入私人盘的工作，等完成以后，直接扫00盘里面的茶先生文件夹即可，movie和show都可以删掉了\n大体是这样了，我在演示服务器已经成功，欢迎围观 emby.giagia.ga\n再次感谢茶先生的无私精神\n排错 emby无法读取挂载目录 如果是在docker环境下，检查创建/拉取容器的命令里面是否有给容器root权限参数\n-e UID=1000 -e GID=100 -e GIDLIST=100  rclone挂载命令是否有\n--allow-non-empty --allow-other "
+},
+{
+	"uri": "http://dxz.plus/posts/travisgo/",
+	"title": "解决 hugo travis 部署博客 failed and exited with 2 during . 错误",
+	"tags": ["hugo", "hugo", "travis", "blog", "博客"],
+	"categories": [],
+	"series": [],
+	"description": "chilling",
+	"content": "案由 昨天晚上想要更新一下博客，因为发现之前的 docker v2ray ss emby CDN 自选 cloudflare 节点 简单教程 + trojan 特洛伊 可以完全自动化了。 但是在推送到github的时候，travis控制台出现failed and exited with 2 during .错误，各种重启，折腾，睡觉，折腾，依然无效 真是难坏小白了\n经查 没关系 有谷歌大法，万事可解。我也想用百度啊，可是百度搜索根本没结果啊。。。 貌似这个是 travis 使用 go 1.1.11.x 版本的时候木有加载MODULEs\nIf GO111MODULE=auto or is unset, then the go command enables or disables module support based on the current directory. Module support is enabled only when the current directory is outside GOPATH/src and itself contains a go.mod file or is below a directory containing a go.mod file.  结案 天上一条\nenv: - GO111MODULE=on  执行 都说hugo逼格高，哪哪儿好的，又是travis 自动部署，又是GitHub存储。我一个小白怎么用着这么难受呢？ 说实话，真不如typcho，直接在网页端编辑，写作了，简单粗暴\n也可能我是纯白吧，饕餮大餐怕吃相难看呢\n更新 今天又出幺蛾子 把环境改成如下才可以，小白真难\nsudo: false language: go dist: bionic env: global: - CACHE_NAME=${TRAVIS_ARCH} - GO111MODULE=on - GOPROXY=https://proxy.golang.org - HUGO_BUILD_TAGS=extended  嗯，这回稳定多了，上述是按照官方的示例文件写的，应该能稳定一度时间了\n"
+},
+{
+	"uri": "http://dxz.plus/posts/searchboos/",
+	"title": "善用谷歌查找电子书",
+	"tags": ["tips", "google", "search", "books", "mobi", "epub", "pdf", "reddit"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "谷歌是好用的，但是我不会，之前\n可有可无 前段时间找科幻大佬的 Supernova Era，某宝之前买书的几家小店已经关门了，Google半天也是各种骗点击网站，sb百度更不用说了。 直到群里一个国际友人提醒，在 Reddit上买有这样一个群组，一葫芦画瓢就找到了口水已久的书。开心\n用法 随便一个帖子就有各种搜索方法，比如这里 示范 比如搜索大刘的 Supernova Era\nintitle:\u0026quot;pdf|epub|mob\u0026quot; \u0026quot;supernova era\u0026quot; -inurl:(jsp|pl|php|html|aspx|htm|cf|shtml)  结果出来了，第一条链接并不是杀人医院呦，好棒 今晚有小说可以看了 当然，除了电子书意外，视频，音频，都可以用上述方法实践\n"
+},
+{
+	"uri": "http://dxz.plus/posts/finalspeed/",
+	"title": "Finalspeed 拯救辣鸡",
+	"tags": ["Finalspeed", "vps", "联通", "电信", "路由器"],
+	"categories": [],
+	"series": [],
+	"description": "lukewarm",
+	"content": "重启弃用多年的Finalspeed加速，配合软路由，实现小鸡高高飞起\nwhy？ 今晚和群友讨论透明代理，忽然想到可以配合废弃很久的Finalspeed加速小辣鸡，水一篇庆祝博客搬家\n爱尔兰小鸡加速前后对比 Finalspeed服务端 一键脚本\nwget -N --no-check-certificate https://raw.githubusercontent.com/91yun/finalspeed/master/install_fs.sh \u0026amp;\u0026amp; bash  如果没有java 一并安装了\napt update apt install default-jre  如果一切顺利 Finalspeed已经启动了，看看是否跑起来\n/etc/init.d/finalspeed status  安装 ss 服务端 见之前的文章，注意的一点是，ssServer配置文件的 timeout 要写大一点，防止ss断线 mac 客户端 下载这个文件, 文件来自Gayhub 解压到本地，建立client_config.json文件，放到对应客户端同目录，写入如下内容\n{\u0026quot;auto_start\u0026quot;:false,\u0026quot;download_speed\u0026quot;:23831272,\u0026quot;protocal\u0026quot;:\u0026quot;tcp\u0026quot;,\u0026quot;recent_address_list\u0026quot;:[\u0026quot;52.211.207.153\u0026quot;],\u0026quot;server_address\u0026quot;:\u0026quot;52.211.207.153\u0026quot;,\u0026quot;server_port\u0026quot;:150,\u0026quot;socks5_port\u0026quot;:1083,\u0026quot;upload_speed\u0026quot;:5957818}  默认跑TCP，如果你小鸡是ovz，那只能选udp，这样电信可能会效果不好。\n配置好以后 打开终端 进入客户端目录，\njava -jar finalspeed_client.jar  之后会弹出java界面 按照如下配置Finalspeed客户端和ss客户端 同理，可以把finalspeed客户端挂在linux上。比如linux的地址192.168.1.88，ss远程端口是9000 本地是9001。那么路由器的ss就直接IP写为192.168.1.88 端口 9001 加密和vps上安装的ss一样就行了。路由器的ss客户端自带dns分流，可以非常方便的使用。 当然，接续上面的配置，在路由器的ss客户端按照上面配置填写信息，也是可以运行的。\n效果  路由器设置 留坑 童鞋们们先试试电脑端是否可行，如果可以的话，再写软路由的 本地linux安装肯能需要桌面环境，或者要显卡支持？反正我是没成功，不过收之桑榆，esxi虚拟的win8可以运行客户端，那么配置就更简单了。 直接在win8打开客户端，配置 软路由或者硬路由设置 可能是本地esxi性能太渣，win8客户端速度不是很好。 DONE"
+},
+{
+	"uri": "http://dxz.plus/posts/dockerv2rayssembytrojancdn/",
+	"title": "docker v2ray ss  emby  CDN 自选 cloudflare 节点 简单教程 + trojan 特洛伊",
+	"tags": ["ss", "v2ray", "docker", "trojan", "CDN", "cloudflare", "tls"],
+	"categories": [],
+	"series": [],
+	"description": "HOT",
+	"content": "参考 使用docker快速部署shadowsocks-libev+v2ray-plugin 和 V2Ray拒绝减速CDN，自选香港日本CDN节点两位的方法, 结合秋水提供的 ss-libev 和 v2ray 两个 dockers 用起来非常爽，全走CDN，不再阻断，速度尚可。总结一下\n废话，可以不看  垃圾小鸡如何拯救（剁手党如何回本）？雪嫩的小白，如何有工程师的感觉？ 经济不景气如何提振？看这里就对了 折腾了两天，基本实现想要的效果:docker 配置 ss+v2ray+emby ws+http+tls+CDN。为了掩饰，我在aws的lightsail开了一个爱尔兰节点的小鸡，512内存，基本匹配市面垃圾小鸡。 Docker的有点就是一旦搭建好以后，可以随便折腾，配置文件保存到本地，换机分分钟 caddy 的优势是及其轻量，同时可以自动申请并续期证书，方便到家 但是现在有一个坑卡住了，就是caddy自动申请脚本，还是要到dns去添加txt记录，而教程里面是要到阿里云的dns去添加txt。所以不能自动。以本白现在的水平，搞不定了，期待高手出现。。。 除了这篇手动教程，还有很多选择，比如这篇面板教程，也非常方便。还有这篇，是我之前一直在用的一键脚本。在多数新装的vps上面都可以成功。本教程的目的就是一个：折腾 如果你对自己折腾出来的东西感到开心，不怕麻烦，那就继续 当然，自己折腾，把思路整理清楚了，基本上什么环境都可以适用，并且配置文件完全自己驾驭，想改什么都可以。不像用脚本，出了问题，出了换系统，换脚本之外，别无他法，相当无助 当然，教程还需要完善，也有很多错误，需要慢慢改 caddy配置文件里面有3个网站v2，ss，emby 按需使用，增减设置文件，开停相应docker即可 折腾开心哈 注意，教程里面的 邮箱信息 API 信息以及密码 UUID等 需要你自己更改，不要和教程的一毛一样\n视频记录   干什么都有第一次，这个视频够简陋的了，打码就废了好长时间。机器也不行，小白难，穷小白难上加难\n搞定CDN  ##准备工作 lightsail的系统太操蛋，先dd个debian 9 用脚本\napt update apt install curl screen zip nload nano -y apt-get install -y xz-utils openssl gawk file bash \u0026lt;(wget --no-check-certificate -qO- 'https://moeclub.org/attachment/LinuxShell/InstallNET.sh') -d 9 -v 64 -a -firmware  等几分钟就可以root登陆了 密码是 MoeClub.org\n直接上CDN，看这个视频，到这个网站添加域名。主域名，二级域名都行. 这里添加3个二级 分别是 sslbv v2ray 和 emby 记下CNAME，然后去dns服务商出添加cname，比如阿里云免费提供的dns解析 如下添加3个 安装一些必备的东西 apt update apt install curl screen zip nload nano fuse -y  安装embyserver的部分参见之前的帖子，注意建立本地用户就行了，不需要连接账户登陆。因为我不知掉的原因，用emby账户无法走CDN加速。\n安装caddy并申请证书  证书用caddy申请，参照这篇帖子，看到搞定cloudflare的 API KEY 即停。后面的申请不用acme.sh脚本。 在ssh里面执行 export的环境设置\nexport CLOUDFLARE_EMAIL=\u0026quot;youremail@gmail.com\u0026quot; export CLOUDFLARE_API_KEY=\u0026quot;xxxxxxxxxxxxxxxxxxxxxxxxxxx\u0026quot;  安装caddy curl https://getcaddy.com | bash -s personal tls.dns.cloudflare  caddy申请证书 建目录，放文件\nmkdir /root/caddy cd /root/caddy nano /root/caddy/Caddyfile  把下面内容添加到Caddyfile\nsslbv.madelonely.ml { gzip tls { dns cloudflare } log /root/caddy/caddy.s.log proxy / https://baidu.com proxy /dxz 127.0.0.1:9999 { websocket header_upstream -Origin } } v2ray.madelonely.ml { gzip tls { dns cloudflare } log /root/caddy/caddy.v.log proxy /dxz 127.0.0.1:8888 { websocket header_upstream -Origin } } emby.madelonely.ml { gzip tls { dns cloudflare } log /root/caddy/caddy.e.log proxy / 127.0.0.1:8096 { header_upstream -Origin websocket } }  然后执行\ncaddy -conf /root/caddy/Caddyfile  这时候回提示输入邮箱，随便写，回车之后开始验证dns，不要紧，继续操作。 回车后到之前 CF Parterner 网页，刷新一下，找到如下的新记录 将两行文字复制到dns解析的地方，添加txt记录 完成验证 ssh这边已经验证完毕，并正常运行caddy服务 接着按照视频教程走可以指定CDN节点，最后效果是这样。当然，也可以全部搞定再慢慢调整 把申请好的sslbv的证书复制到/root/caddy/ssplugin/\nmkdir /root/caddy/ssplugin/ cp /root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/sslbv.madelonely.ml/sslbv.madelonely.ml.crt /root/caddy/ssplugin/plugin.crt cp /root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/sslbv.madelonely.ml/sslbv.madelonely.ml.key /root/caddy/ssplugin/plugin.key  至此，tls搞定。\n挂载给emby读取00盘  curl https://rclone.org/install.sh | bash mkdir /root/rclone/ mkdir /root/rclone/00  先执行rclone config 然后q退出\nnano /root/.config/rclone/rclone.conf  把正常使用的rclone.conf文件内容粘贴到rclone.conf里面，不用重新配置rclone了 添加到开机启动\nnano /etc/crontab  最下面加入\n@reboot root rclone mount TD00: /root/rclone/00 --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G --allow-non-empty --allow-other --dir-cache-time 12h \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  也可以把证书更新后copy给ss docker用的加到crontab里面，真正实现证书全自动续期，不用再管了 (注意一下，如果按照本片教程指定CDN是无法全自动，如果直接cf指定节点，也就是有cf而不是像我由阿里云解析dns，那是可以做到全自动的)\n0 0 0 * * root cp /root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/sslbv.madelonely.ml/sslbv.madelonely.ml.crt /root/caddy/ssplugin/plugin.crt 0 0 0 * * root cp /root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/sslbv.madelonely.ml/sslbv.madelonely.ml.key /root/caddy/ssplugin/plugin.key  为了避免错误，先增加虚拟内存，2-3g\nwget https://www.moerats.com/usr/shell/swap.sh \u0026amp;\u0026amp; bash swap.sh  按1再写1000-2000\n挂载 可先把后台参数 \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp; 去掉 加上 -vvv 参数 等没问题在加后台参数 \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;\nrclone mount TD00: /root/rclone/00 --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G --allow-non-empty --allow-other --dir-cache-time 12h \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  docker镜像  v2ray 在 /root/caddy/v2ray下新建文件config.json\nmkdir /root/caddy/v2ray nano /root/caddy/v2ray/config.json  将如下内容填入config.json文件（相应位置自己改）\n{ \u0026quot;log\u0026quot; : { \u0026quot;access\u0026quot;: \u0026quot;/var/log/v2ray/access.log\u0026quot;, \u0026quot;error\u0026quot;: \u0026quot;/var/log/v2ray/error.log\u0026quot;, \u0026quot;loglevel\u0026quot;: \u0026quot;warning\u0026quot; }, \u0026quot;inbounds\u0026quot;:[{ \u0026quot;port\u0026quot;: 8888, \u0026quot;protocol\u0026quot;: \u0026quot;vmess\u0026quot;, \u0026quot;settings\u0026quot;: { \u0026quot;clients\u0026quot;: [ { \u0026quot;id\u0026quot;: \u0026quot;ae2a6c5e-11d7-11ea-8d71-362b9e155667\u0026quot;, \u0026quot;level\u0026quot;: 1, \u0026quot;alterId\u0026quot;: 88 } ] }, \u0026quot;streamSettings\u0026quot;: { \u0026quot;network\u0026quot;: \u0026quot;ws\u0026quot;, \u0026quot;wsSettings\u0026quot;: { \u0026quot;path\u0026quot;: \u0026quot;/dxz\u0026quot; } } }], \u0026quot;outbounds\u0026quot;: [{ \u0026quot;protocol\u0026quot;: \u0026quot;freedom\u0026quot;, \u0026quot;settings\u0026quot;: {} }] }  这个配置文件是否可用，自己可以到这个网站自查。 这个网站可以生成自己的uuid\nss-lbev 创建ss-libev配置文件\nmkdir /root/caddy/ssplugin nano /root/caddy/ssplugin/config.json  写入如下内容\n{ \u0026quot;server\u0026quot;:\u0026quot;127.0.0.1\u0026quot;, \u0026quot;server_port\u0026quot;:9999, \u0026quot;method\u0026quot;:\u0026quot;aes-128-gcm\u0026quot;, \u0026quot;timeout\u0026quot;:300, \u0026quot;password\u0026quot;:\u0026quot;dxz\u0026quot;, \u0026quot;fast_open\u0026quot;:false, \u0026quot;nameserver\u0026quot;:\u0026quot;8.8.8.8\u0026quot;, \u0026quot;mode\u0026quot;:\u0026quot;tcp_and_udp\u0026quot;, \u0026quot;plugin\u0026quot;:\u0026quot;v2ray-plugin\u0026quot;, \u0026quot;plugin_opts\u0026quot;:\u0026quot;server;path=/dxz\u0026quot; }  emby emby不需要配置文件，一行命令搞定\n安装docker 脚本\ncurl -fsSL https://get.docker.com -o get-docker.sh sh get-docker.sh  pull docker镜像 docker run -d -p 8888:8888 --name v2 --restart=always -v /root/caddy/v2ray:/etc/v2ray teddysun/v2ray docker run -d --name ss --restart always --net host -v /root/caddy/ssplugin:/etc/shadowsocks-libev teddysun/shadowsocks-libev docker run --name=emby -d -v /root/emby/config:/config -v /root/rclone/00:/00 --net host -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  再次添加 api\nexport CLOUDFLARE_EMAIL=\u0026quot;youremail@gmail.com\u0026quot; export CLOUDFLARE_API_KEY=\u0026quot;xxxxxxxxxxxxxxxxxxxxxxxxxxx\u0026quot;  执行caddy，启动3个docker的cdn连接 caddy -conf /root/caddy/Caddyfile  这时候可以看提示，有错误就看看哪儿的问题，解决一下。没有问题就下一步\n开机启动脚本  新建启动文件\nnano /root/caddy/caddystart  写入下列内容\n#!/bin/bash CLOUDFLARE_EMAIL=\u0026quot;youremail@gmail.com\u0026quot; \\ CLOUDFLARE_API_KEY=\u0026quot;xxxxxxxxxxxxxxxxxxxxxxxxxxx\u0026quot; \\ caddy -conf /root/caddy/Caddyfile \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  利用crontab自启动\nnano /etc/crontab  最下一行写入\n@reboot root bash /root/caddy/caddystart  这样每次重启就自动运行三个网站，并自动开启CDN。 更新证书还是没有解决，因为指定CDN的原因，必须手动复制txt到dns解析服务。 但是如果不指定DNS，那么这个脚本就真正做到完全自动化了 一点点遗憾\n据最新“美颜社”消息，指定cdn时候验证的txt不再是随机字符，而是固定格式（截屏） 格式如下： 也就意味着，添加一次txt，以后每次开机，caddy会帮你自动更新或申请证书。\n更新证书无需验证\n自此，完全自动化达成•真香\nVOILA  补充 \u0026ndash;\n1. 我这里开cf 白天看00盘里的4k电影很轻松，remux 4k 有难度。可能是CDN的IP选的不好，以后慢慢找 2. 晚上速度待测，昨天速度只有10Mb/s，比较差，符合垃圾小鸡的水平，但是比直连要快 3. 晚上高峰结果，40m码率无压力  4. 爱尔兰小鸡直连和CDN对比 5. 如果都搭建好了，发现不走CDN，试试去cloudflare改下SLL/TLS设置 6. docker的用途还有很多，比如折腾久了，想记录一下，写个记录之类的，比如这个博客就是用docker搞定的改Hugo了，也挺香。typecho wordpress hexo 都可以，简单几步，5分钟，以后会出教程。 7. 添加特洛伊 trojan 申请证书 只需在/root/caddy/Caddyfile添加一个记录，就可以申请 证书\ntrojan.trumptheidiot.tk { gzip tls { dns cloudflare } log /root/caddy/caddy.s.log proxy / https://baidu.com proxy /dxz 127.0.0.1:9999 { websocket header_upstream -Origin } }  运行 caddy -conf /root/caddy/Caddyfile 就可以自动开始申请证书，添加TXT记录方法同上\n证书申请完后，记得先删/root/caddy/Caddyfile文件内刚刚添加的用于申请证书的内容，否则就套了CDN，trojan的效果大打折扣。\n新建目录，写配置 mkdir /root/trojan nano /root/trojan/config.json  密码dxz，改成你想要的\n{ \u0026quot;run_type\u0026quot;: \u0026quot;server\u0026quot;, \u0026quot;local_addr\u0026quot;: \u0026quot;0.0.0.0\u0026quot;, \u0026quot;local_port\u0026quot;: 443, \u0026quot;remote_addr\u0026quot;: \u0026quot;127.0.0.1\u0026quot;, \u0026quot;remote_port\u0026quot;: 80, \u0026quot;password\u0026quot;: [ \u0026quot;dxz\u0026quot; ], \u0026quot;log_level\u0026quot;: 1, \u0026quot;ssl\u0026quot;: { \u0026quot;cert\u0026quot;: \u0026quot;/config/certificate.crt\u0026quot;, \u0026quot;key\u0026quot;: \u0026quot;/config/private.key\u0026quot;, \u0026quot;key_password\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;cipher\u0026quot;: \u0026quot;ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256\u0026quot;, \u0026quot;prefer_server_cipher\u0026quot;: true, \u0026quot;alpn\u0026quot;: [ \u0026quot;http/1.1\u0026quot; ], \u0026quot;reuse_session\u0026quot;: true, \u0026quot;session_ticket\u0026quot;: false, \u0026quot;session_timeout\u0026quot;: 600, \u0026quot;plain_http_response\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;curves\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;dhparam\u0026quot;: \u0026quot;\u0026quot; }, \u0026quot;tcp\u0026quot;: { \u0026quot;prefer_ipv4\u0026quot;: false, \u0026quot;no_delay\u0026quot;: true, \u0026quot;keep_alive\u0026quot;: true, \u0026quot;fast_open\u0026quot;: false, \u0026quot;fast_open_qlen\u0026quot;: 20 }, \u0026quot;mysql\u0026quot;: { \u0026quot;enabled\u0026quot;: false, \u0026quot;server_addr\u0026quot;: \u0026quot;127.0.0.1\u0026quot;, \u0026quot;server_port\u0026quot;: 3306, \u0026quot;database\u0026quot;: \u0026quot;trojan\u0026quot;, \u0026quot;username\u0026quot;: \u0026quot;trojan\u0026quot;, \u0026quot;password\u0026quot;: \u0026quot;\u0026quot; } }  启动trojan docker，端口由于我在原有基础上添加，所以不能用443，改成32400，假装是plex服务器。你可以改成443，更真一些。\n启动trojan docker docker run -dt --name trojan -v /root/trojan:/config -p 32400:443 trojangfw/trojan  看启动日志，排错 docker logs -f trojan  客户端 可以安装OpenWRT，一些固件已经自带trojan了 win mac 可以参考这篇文章 文章写的比较早，ios没提到小火箭，亲测小火箭可用，只需要添加相应（子）域名和密码即可。 注意的是，用cloudflare DNS 解析的时候，一定要把 云朵图标熄灭 有疑问或者有能力帮我填坑请(via频道主加群)\n"
+},
+{
+	"uri": "http://dxz.plus/posts/oracle/",
+	"title": "甲骨文 免费鸡 重装系统 dd debian 9",
+	"tags": ["oracle", "blog", "vps", "free"],
+	"categories": [],
+	"series": [],
+	"description": "chilling",
+	"content": "ss最近太难受，而手里的甲骨文免费小鸡，无论如何也安装不上wireguard，系统是 ubuntu 18. 决定dd个debian。但是命令执行不下去，没办法，只好先创建一个收费鸡，系统换到16，然后在dd脚本至debian9\n思路 创建新鸡，把老鸡的引导盘挂载到新鸡，把新鸡到引导盘dd到挂载的老鸡上（千万别搞反了，比如我。。。） 补充一点（避免“如不自宫也成神功”的尴尬），如果你的免费鸡没有问题，只是Ubuntu版本选错想换版本dd的话，直接创建付费版，直接dd，成功了再照下面dd给免费版。这样比较安全。 创建收费鸡\n 当然选择最便宜的，也就几个小时，不会花费太多。 之后来到老鸡的控制面板，先关机，再到最下，BOOT Volume处点击右面的三个点儿，选择detach 然后到新鸡处在attched block volumes选择刚才detach下来的volume，attach以后选择三个点 再点iscsi command 之后复制attach的信息，粘贴到SSH里面，就可以挂载了。运行fdisk -l查看挂载情况，我这里/dev/sdb就是新盘。 确定好以后，开始\ndd Ubuntu 16 dd命令\n dd if=/dev/sda of=/dev/sdb  为了防止断网之类的，用screen命令运行，这样可以随时查看，当然也没啥查看的，命令执行以后，没有任何反应，直到3-4个小时之后才有结果。\n成功以后 还要去刚才复制iscsi信息的地方 复制detach命令，去新鸡用 SSH 登陆 卸载磁盘，然后删掉付费鸡。重启免费鸡，ubuntu16到手 下面开始\ndd Debian9 用viser的命令\napt-get update apt-get install -y xz-utils openssl gawk file bash \u0026lt;(wget --no-check-certificate -qO- 'https://moeclub.org/attachment/LinuxShell/InstallNET.sh') -d 9 -v 64 -a -firmware  再经过十来分钟，看到ssh断开，ping断断续续几次，ssh就又连上了。至此，dd完毕，进入debian9.密码是 MoeClub.org\n 终于舒服了 VOILA\n一个小坑 秋水大佬的脚本生成的client文件无法在 lede 的路由器上面用，手机电脑是可以的。最后还是用逗比的，手机电脑 lede 通吃。\n"
+},
+{
+	"uri": "http://dxz.plus/posts/autorclonetips/",
+	"title": "Autorclone 教程的一些tips及折腾中遇到的错误的解决办法",
+	"tags": ["autorclone", "gdrive", "google", "rclone", "folderclone", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "用autorclone对于小白的我来说还是挺挑战的，一些基本操作都不会，遇到问题只能靠google，还好多数问题都能找到答案。整理一些使用中的小技巧，和一下自己使用过程中遇到的一些错误以及解决办法，让更多小白更顺畅的折腾。保持更新 UPDATING\u0026hellip;\nTips  UPDATE-20210424 F/Gclone简单用法，如果你还没有SA，可以用我的900SA\n到GD/TD目录，给这个群组dxzdxz@googlegroups.com写入权限即可\n注意千万别用这个公用的900sa转存个人文件，其他人用这些个SA可以看到你盘里面的内容\n建议还是自己按部就班搞定几百个SA来用\nGclone 安装\nwget -qO- https://api.github.com/repos/donwa/gclone/releases/latest \\ | grep browser_download_url | grep Linux_x86_64 | cut -d '\u0026quot;' -f 4 \\ | wget --no-verbose -i- -O- | gzip -d -c \u0026gt; gclone sudo mv gclone /usr/bin sudo chmod +x /usr/bin/gclone  Fclone\nwget -qO- https://api.github.com/repos/mawaya/rclone/releases/tags/fclone-v0.4.1 \\ | grep browser_download_url | grep linux-amd64 | cut -d '\u0026quot;' -f 4 \\ | wget --no-verbose -i- -O- \u0026gt; fclone.zip unzip -j fclone.zip sudo mv fclone /usr/bin sudo chmod +x /usr/bin/fclone  安装好以后 执行 fclone config 看看有没有配置好的内容\n如果没有的话\n把900sa进去\nwget https://share.dxz.plus/BlogContent/900SAconfig.zip unzip 900SAconfig.zip -d /root/.config/rclone  这时候执行\ngclone lsd 900: 或者 fclone lsd 900:  应该能看到00盘的TEST目录内容了\n实时log autorclone真正造福GDer了，甩一条命令就算完事儿。没有报错，就盯着可是速度也没有，进度也没有，究竟在搞什么？可以看log文件啊？但是log文件有时候很大，看起来不方便，如果能实时观察autorclone运行情况岂不是更好？这样， 先开一个screen\nscreen -S live-log  在autorclone文件夹下面，运行如下命令\ntail -f log_rclone.txt  拷贝域外共享关闭的GD 有些学校比较操蛋（安全原因或者被撸疼了），关闭域外共享，sa即使添加以后，autorclone也会出各种问题，不顺畅。 可以利用之前创建的group来绕过限制\nFolderclone\t新版本定时运行并输出结果到文件 把accounts文件夹放入/root目录，然后在/etc/crontab添加一条\n0 */8 * * * root multifolderclone -s SSSSSSSSSSS-d DDDDDDDDDDDD --verbose 2\u0026gt;\u0026amp;1 | tee rclone.log  这里定义的是每隔8小时运行一次，可以根据需要自行设置\n等运行（完毕）的时候就可以在/root/rclone.log看到的运行情况了\ntail -f /root/rclone.log #实时 cat -f /root/rclone.log  其中--verbose是啰嗦输出结果 没啥必要，可以不用 手动替换载入rclone的config文件，突破750G上传限制 这个其实应该算是基本rclone操作了，也说一下吧。毕竟host大法上传免流，日750g肯定不够用。另外挂载vps的embyserver刮削也可能突破750g，换配置不麻烦，创建rclone账号是个问题，用已有SA的config文件就简单多了。\n这里还是用900SA来演示，利用900SA做的相关文件已经好了，下载即可。由于900SA已经加到00盘，挂载00盘的可以直接用。找茶先生把私人盘也加进去了，至少00和私人盘可以用900sa肆意刮削了\n把accounts文件夹放到/root/.config/rclone/文件夹下，并替换该目录下rclone.conf文件。或者再原来配置文件最下添加SA账号也行。再把该SA所属的group加入到要刮削或者上传的共享GD/TD，给读或者写权限。\n替换rclone命令\numount /root/rclone/ldfdsa00 ##改成你自己的挂载点 rclone mount 101: /root/rclone/ldfdsa00 ##101换成你自己定义的编号，ldfdsa00换成自己的挂载点  由于900SA可能多人共享使用，所以这里从101.json开始 一直到200.json\n如果自己的group，那么rclone.conf文件写成这样\n## [原来的配置] 。。。 [101] type = drive scope = drive service_account_file = /root/.config/rclone/accounts/101.json team_drive = 0ACflmF7V9qaJUk9PVA [102] type = drive scope = drive service_account_file = /root/.config/rclone/accounts/102.json team_drive = 0ACflmF7V9qaJUk9PVA 。。。  再把相应的SA文件放到accounts文件夹即可 虽然这样省不了多少时间，操作也不能自动化，但是胜在可以利用之前创建group时候的SA，省的自己创建rclone账号了。\n错误综述  基本上autorclone 和folderclone错误主要就是 环境+权限+翻墙。 先看几遍教程，大概了解原理，然后按照 环境+权限+翻墙 的顺序一个个排错吧，这就是折腾的乐趣所在，isn\u0026rsquo;t it ?!\n错误1  提示如下： 重装所有依赖 原来的命令添加-m --user参数 例如：\npython pip -m install --upgrade pip --user  错误2 'ascii' codec can't decode byte 0xe2 in position 0: ordinal not in range(128)\n这是因为python版本错误，FC需要3.x，而某些VPS默认是2.x版本 那么可以直接覆盖安装3.x版本的python 然后指定默认python版本即可。\nwget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tar.xz \u0026amp;\u0026amp; \\ tar -xvf Python-3.7.2.tar.xz \u0026amp;\u0026amp; \\ cd Python-3.7.2 \u0026amp;\u0026amp; \\ ./configure \u0026amp;\u0026amp; make \u0026amp;\u0026amp; sudo make altinstall  修改bashrc配置文件\nnano ~/.bashrc alias python='/usr/local/bin/python3.7'  重新加载 .bashrc 文件，使操作生效\n. ~/.bashrc  UPDATING\u0026hellip;"
+},
+{
+	"uri": "http://dxz.plus/posts/autorclonesagroup/",
+	"title": "AutoRclone 手动加 SA 到 Group 5分钟 5minuts",
+	"tags": ["autorclone", "gdrive", "google", "rclone", "folderclone", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "手动添加 SA 到 group 非常简单,就是比较耗时,因为每天只能添加100个 SA 到group 。因为只需要添加一个用户 (admin) 即可操作 autorclone，实现更高效的操作（折腾） gdrive 互拷。\n准备工作 结合这篇堪称完美的教程，拿到 SA.json files. 并通过 Chrome 的 Email Extractor 插件提取到邮件地址。 下一步就是\n创建group 在这里创建 group， 例如，jkljkl@googlegroups.com就是管理员，也是最后要加到TD目录的 SA group\n按图添加, 一步都不要错，否则就得24小时后在添加了，比如我 添加10个 重复10次/24小时 添加完毕以后把管理员加入共享目录 确保 SA.json 都在 accounts 目录 执行脚本 VOILA ！ 比如 因为我把dxzdxz@googlegroups.com加入到00共享盘了，并给了读取权限。你只需要把dxzdxz@googlegroups.com加入到你自己的团队盘 给写入权限 就可以用autorclone把里面的东西都复制到你的团队盘了。\n又如 你自己创建一个group,god@googlegroups.com，加一个你自己的真人号，这样，你用god这个号申请进入某个团队，比如dajiejie，等批准以后，god这个group里面的真人号直接能看到dajiejie里面的文件夹，得到文件夹ID，用这个ID，你就可以用god这个group里面的几百个SA搬运，实现一个号，搬运一个团队盘。\n补充1：自动移除SA 如果你是FC创建的SA，官方git里面提供了移除sa脚本，我下载过来了，你直接用\n把文件放到FC的目录里 在cmd里执行\npython removesa.py （你的TD）ID  原来500多SA，基本都移除了，voila 补充2: 提取autorclone脚本生成的sa地址 非凡大佬随手给了一个脚本造福小白。 直接把exe文件放到含有.json文件的文件夹，双击，秒生成user.txt 补充3 实际上添加到group的sa是可以由普通15g账号创建的，使用上也和edu创建的没有区别。\n排错 试图移除下一个目录时，发现如下错误 cmd没上梯子 controller账号没给manager权限\nDONE"
+},
+{
+	"uri": "http://dxz.plus/posts/autorclonesa5minutes/",
+	"title": "AutoRclone 教程 Tutorial 利用Group添加SA，5分钟搞定 gdrive转存 Adding Service Accounts (SA) to a Googlegroup",
+	"tags": ["autorclone", "gdrive", "google", "rclone", "folderclone", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "嘚哔嘚 为了让小白真正实现5分钟学会用好autorclone转移Gdrive资源，我真是不遗余力。。。 经过Autorclone和Panini两位大佬指导，学会了用Group添加SA，虽然是手动的，比较费事，但是弄好以后一劳永逸。我提供的SA账号里面预计会加入900个SA。届时你只需要将这个GROUP地址dxzdxz@googlegroups.com加入（源）目标TD文件夹（管理员身份）即可。\nTo use autorclone is pretty easy when you get the googlegroup all set. To facilitate that, here we have a finished group, which you can use to test the water. Just add dxzdxz@googlegroups.com to your teamdrive(TD) or googledrive(GD) as a manager, and that\u0026rsquo;s all\npython环境安装 python env install 这是最难的，如果安装好python环境，你就成功一半了。\nThat\u0026rsquo;s the crucial part and when it is done, you are already halfway through\n按这个大佬的教程走，python成功再回来\nFollow this tutorial and get the python installation part set.\n添加group账号 add group account to your TD 把dxzdxz@googlegroups.com添加到TD盘或者edu盘（单文件15G限制）的目录（即目标目录），权限是管理员，并记下目标目录ID，备用\nAdd dxzdxz@googlegroups.com to your TD or GD as a manager. the alphabets after https://drive.google.com/drive/folders/ is the folder ID or TD ID. write it down or somewhere \u0026lsquo;cause we\u0026rsquo;ll use them later 准备相关文件 some prep files 下载这个文件并解压，放到任意位置，比如C盘根目录.\nDownload This file and unzip it. place it wherever you like, e.g. C:\\\n执行脚本 run that script 打开cmd，输入\nIn cmd, run the follwing\ncd C:\\AutoRclone-master-demo  然后执行如下命令，源ID和目标ID换成相应你需要的\nThen run the line infra, and replace the source ID and destination ID with your own\npython rclone_sa_magic.py -s 源(source)ID -d 目标(destination)ID -dp 自定目标文件夹目录下的目录名(folder name on your destination TD/GD) -b 1 -e 900 --disable_list_r  Folderclone is almost the same, the essential part is creating SAs. when you have them, you can just add those files to accounts folder and run that script. Here you can reuse mine. Since we are using TD to move files and the SAs are not file owners when the destination is TD, the owner of those files is the Gsuite organisation until they are further moved to your own GD(this GD will be the owner). Those SAs won\u0026rsquo;t have any record about what you are moving and where. So, it\u0026rsquo;s as safe to use mine as it is to yours. The tricky part is Google has a daily transfer limit(750GB) on every SA. If we all use the same SA group to copy files, it may reach that limit easily. To solve that, you\u0026rsquo;ll need your own SA group and that\u0026rsquo;s just a few clicks away from what you\u0026rsquo;ve learned here\nHope you can enjoy the whole process and if there is anything I can help you with, let me know\nThanks for reading this\n"
+},
+{
+	"uri": "http://dxz.plus/posts/host/",
+	"title": "Host大法，实现Gdrive直连",
+	"tags": ["host", "host大法", "联通", "电信"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "结合Gdrive edu版 实现 无限流量 无限速 直连\nwhy？ 因为有30几T的电影在Gdrive里，很多都是蓝光4k REMUX格式，为了省下硬盘的钱，不得不掏钱买好的代理，阿里云200M确实不错，合租70块一年，不过后来bug停了以后，就只好寻找别的办法，adman，justhost都试过，晚10点左右REMUX还是比较难受的。好在发现koolshare论坛上面有这篇文章，我自己搞了一下，发现联通用host解决免流量看Gdrive网盘电影问题，简直不能太爽；经过群友测试，电信大部分地区速度可以，移动就少部分地区可用了。不仅省下了代理的钱，速度更快了。 晚十点左右看4k remux的流量情况 这是和上图对应的87m码率的4k蓝光REMUX的播放情况 用的plex转码 手机本地播放 New DEMO\n 视频有点长，基本意思就是 KODI 的gdrive插件 不支持host。挂载到本地nas，支持。由于我电脑是在太渣，播放视频的时候本地测速只有20来Mb 准备工作 首先得有可以改host的路由器，梅林，老毛子固件的任何路由器，软路由。个人认为硬路由里面性价比最高的就是新路由3，70块钱咸鱼可得。软路由的话我的配置是J3455底层ESXI，虚拟了OpenWRT，win8 x64，debian10和黑裙。OpenWRT做旁路由，需要走host的机器（虚拟机）网关gateway填写旁路由的IP即可。\n可用IP Luckily，这些IP没有失效过，只是不同地区/运营商速度有差异 172.217.160.6/7/8/9 ...所有能ping通的都可以用（目前效果最好的了）\n一下也可以 216.58.204.202 172.217.14.202\n5分钟教程开始 非常简单，看图设置\nLEDE在这里设置 老毛子固件路由器 OpenWRT 这个略微麻烦，但是确是操作最方便，效果也最好的 首先ssh进入路由器 在/etc/目录下创建几个host文件\nvi /etc/host5 vi /etc/host6 vi /etc/host888 ...  host 文件内容是\n172.217.160.6 www.googleapis.com  新建host文件 这样做的好处是在上图界面里可以直接指定相关host文件，如果遇到host连不上，可以自动切换，不会在不知情的情况下走了梯子。 其他路由器由于本人没有，所以也就不测试了。原理是一样的，依葫芦画瓢就行了。\n测速 我这里是采用比较麻烦的方法，但是测ip肯定是准的，不会出现走梯子的情况 把这个文件里面的所有ip换成你要测速的ip，然后将文件扔到OpenWRT的/etc/目录下 按照上上图改路由器host的设置，添加一个/etc/host.test的文件地址即可\n测速命令用我的盘里2G大小的一个视频。需要在linux下执行，网关设为host所在路由器的IP\nwget --load-cookies /tmp/cookies.txt \u0026quot;https://docs.google.com/uc?export=download\u0026amp;confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download\u0026amp;id=1Ygr_r4vUlT1WlCZMKgVOcj_-IW86DbtN' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\\1\\n/p')\u0026amp;id=1Ygr_r4vUlT1WlCZMKgVOcj_-IW86DbtN\u0026quot; -O test \u0026amp;\u0026amp; rm -rf /tmp/cookies.txt  晚上10点的效果，北京联通\n测速视频\nDONE 当然，方法有了，没有东西看怎么行？内容为王啊\n福利 我的电影库永久免费开放，私我你邮箱即可加入，我和群里的小朋友一起维护，一起备份，一直更新 里面的文件 如果有1080p和4k的都在4k目录下了，4k有两种 一种REMUX蓝光原盘，体积大，一种原盘rip体积小，有的话我也会放到一起。直接用emby/plex扫就行，一般都有字幕。也可以用nplayer或者其他播放器挂你的gmail，就能打开共享盘00了\n大不了加频道，进群\nhttps://t.me/gdriveHost （为避免被各种骚扰，改私密群了，这样比较安全，加频道主进群即可。稍微麻烦点儿，抱歉了\n主页已更新TG\n从群主到管理全是小白，给你足够自信，让你畅所欲言\n"
+},
+{
+	"uri": "http://dxz.plus/posts/gdrive15g/",
+	"title": "5分钟-15G普通Gdrive账号变身无限制用不翻车账号",
+	"tags": ["autorclone", "gdrive", "google", "rclone", "folderclone", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "最近gdrive有很多骚操作，玩了一段时间，做个记录吧。\n关于 无限空间 gdrive普通账号提供15G免费空间，普通edu账号提供无限空间，附带团队盘的账号团队盘提供无限空间，但是所有者是域管理员，并且但文件夹受限40万文件数量\n关于转存 由于谷歌限制单账号上传下载总容量750G天，备份几百T级别的存储内容异常痛苦。github大佬研究用sa（service account）的方法转存,但是这个方法（FC/MC）虽然速度飞快，却有个问题，大量文件夹会丢失很严重，并且重新运行一遍的化会全盘重来，而不是续传。 在此基础上，又有大佬利用sa账号接力的方法使用rclone，这个方法（AR）是目前在用的最好的解决方案了，兼顾速度和断点续传。毕竟就是rclone嘛，区别就是所有文件的所有者是sa。\n关于sa所有者及15G普通账号变不翻车无限账号 嗯。。。sort of。。。 sa固然方便，但也不是没有限制（虽然可破，后文），所有的账号（15g普通/普通edu/团队）sa作为所有者，单文件15G受限，只有域管理员可以改，但目前没发现哪家改过，gsuite大佬可以一试。如果普通15g账号创建sa，单文件5T限制，总容量普通gmail账号无限制（有传说1PB，未证实）。也就是说普通15G账号经过团队盘中转，已经可以实现无限空间+单文件5T了。这时候你只需要随意加一个下面提到的团队盘就可以实现中转了，而不像以前，必须用edu创建的机器人才能中转单文件15G-5T大小的文档。但是15G账号基本不会翻车，除非作死或者谷歌该policy把你普通15G账号封了。于是普通15G账号雄起成不翻车的无限容量gdrive（sort of。。。 因为只能中转一次）。那么后面又有什么操作呢？可以再注册一个15G账号嘛，把之前转存的账号作为共享文件夹共享给新建的15G账号，这个15G账号就实现了无限容量，单文件5T限制了。唯一的缺点就是，每次更改文件仓库需要重新操作一次团队盘中转。\n突破15G单文件限制 edu账号创建sa虽然作为owner有15g限制，但是edu的SA本身作为onwer，也有单文件15G限制，而edu本体和15G账号本体作为owner却只有单文件5T限制。那么，突破方法就是——团队盘中转。用AR把别人分享的目录拉到团队盘，这时文件所有者是域，无限制（可能单文件5T限制），这时分两种情况拉出。1，拉到edu任何账号，所有者变成edu，占用edu空间（单文件5T，空间无限，并可继续添加或编辑文件，真无限）；2，拉到15G账号，所有者变该账号（无单文件15g限制）。如果一次拉取超过15G，该账号就不能再添加文件，也可能无法收取邮件（假无限）。但是可以作为如上所述一次性仓库备份整理好的文件。\n不过实际上呢，基本上大于15G的文件都是蓝光原盘 remux之类的，平时不需要动。而资料文件，鲜有超过15G的。那么在用arclone的时候，就可以直接往15G普通账号内的共享目录添加SA，由于这个SA是15G合法账号创建，又是基本不可能翻车的。好了，啰嗦完毕，下面\n最新福利 有大佬分享团队盘，那么就可以按照步骤，享受团队盘的好处了。你只需要一个普通edu甚至15G账号就可以玩儿的很6了 Github (https://github.com/yyuueexxiinngg/some-scripts/blob/master/workers/google/drive/create-share-teamdrive.js) | Demo (https://teamdrive.xcpx.workers.dev/)\nhttps://gd.zxd.workers.dev/ https://www.qq888.workers.dev/ https://td.ur.workers.dev/ https://apply.mcoy.ga/\n有了以上的工具和思路，就可以开工了\n简单教程 准备工作 我看了一下,这篇教程写的非常完美了，小白照做创建SA没有什么难度。如果暂时还没搞定，可以直接用我的机器人。但至少要先把python环境搞定，windows的话，把rlcone WIN版下载下来，rclone目录里面的文件放到FC/AR文件夹即可。然后把我的机器人拿过来直接用。 FC脚本目录到这里下,点击绿色按钮，下载zip文件。再把win版rclone文件放到zip解压后的文件即可使用，因为sa都是通用的。 用AR的话，可以到这里. 在win下，打开cmd，cd到FC或者AR的目录下，把900SA或者你创建的sa文件（xxxx.json）放到AR或者FC的accounts目录下。 900SA位置 先复制300个SA到acclounts目录里 目标目录准备 打开900SA文件夹里面任意一个 .html文件，把所有SA地址都添加到GD的目标文件夹，作为管理者 复制1-299个SA地址 添加SA到目标目录 注意都是可写权限 获取目标ID 复制刚才添加SA文件夹folders/后面部分，即是目标目录ID，源ID同理 执行脚本 完成准备工作后，cmd进入上述目录，命令如下： FC\npython multifolderclone.py -s 源ID（文件夹需要开凭链接可见的共享） -d 目标文件夹ID（需要添加SA写入权限共享）  AC\npython rclone_sa_magic.py -s 源ID（文件夹需要开凭链接可见的共享） -d 目标文件夹ID（需要添加SA写入权限共享） -dp 目标文件夹的新建目录名 -b 1（起始SA，可以略过一些超限的SA） -e 600（终止SA） --disable_list_r  完工 15G邮箱作为存储仓库，owner是15G账号，无15G限制，可以无限容量，但不能编辑/添加 但是可以用其他15G账号当管理员的办法管理该共享空间，并且rclone和nplayer等一干播放器都可以读取share with me的文件夹。\n电影仓库呢，可以用我们的团队盘，里面的内容适合emby和plex搜刮，文件夹内含已经整理好的4k或者1080P的remux/rip文件及相关中英文字幕。你可以根据不同网速选择播放。该盘由小白群成员共同维护，一直更新，保持备份，永久免费。\n排错 确定python正确安装 cmd里面运行\npython -V  有版本号即为成功 如果还不成功，执行下面命令重新安装依赖\npython -m pip install --upgrade pip pip install oauth2client pip install google-api-python-client pip install progress pip install progressbar2 pip install httplib2shim  有问题加群，全是小白，很欢乐\n改私密群了，找频道管家\n"
+},
+{
+	"uri": "http://dxz.plus/posts/backuptypecho/",
+	"title": "rclone 一条命令备份docker搭建的typecho wordpress数据",
+	"tags": ["typecho", "gdrive", "google", "rclone", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "chilling",
+	"content": "废话 typecho没有wordpress那么多插件，自动上传数据库啥的，但是wordpress想备份到gdrive，都要加钱买专业版。但在docker这，你不用花钱。 下面只示例typecho，wordpress同理。\nupdate: 发现在backup文件夹下面会丢失文件 那就不用current了，直接用bakcup带日期，在crontab里面写入\n0 0 * * * root rclone copy /root/xxx.com/ gd:Apps/wordpressBKP/xxx.com/backup/`date -I`  这回好了 命令 利用crotab\n运行：\nnano /etc/crontab  最末一行添加以下内容：\n0 0 * * * root rclone sync /root/app gd:Apps/typecho/oj8k.ml/current --backup-dir gd:Apps/typecho/oj8k.ml/backup/$(date '+%Y-%m-%d-%H%M%S')  说明： 0 0 * * * root rclone sync /root/app gd(你的rclone gdriveID):Apps/typecho/oj8k.ml/current（你的gdrive的备份文件夹） --backup-dir gd(你的rclone gdriveID):Apps/typecho/oj8k.ml/backup/$(date '+%Y-%m-%d-%H%M%S')（按日期备份）  在添加crontab之前可以试试模拟运行一下看看是否报错，注意改你自己的目录和ID\nrclone sync /root/app dl:Apps/typecho/oj8k.ml/current --backup-dir dl:Apps/typecho/oj8k.ml/backup/$(date '+%Y-%m-%d-%H%M%S') -vvv -P --dry-run  成果： 吹吹优点： 1，gdrive无限空间，备份频率你随意，这里是每天备份；\n2，免费，完整备份；\n3，结合docker，恢复起来容易；\n4，独立crontab任务，不用其他任何琐碎应用；\n5，容我想想。。。\n6，。。。\n不懂加群找频道主\n"
+},
+{
+	"uri": "http://dxz.plus/posts/testurl/",
+	"title": "Test-图片外链是否可以用workers的",
+	"tags": ["cloudflare", "blog", "博客", "建站", "workers", "gdrive", "网盘", "谷歌"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "试试看看图片外链是否可以用workers的 那样就省本地空间了\n测试 workers图片 地址\nhttp://share.dxz.plus/BlogContent/Synology%208%20Bay%20NAS%20Diskstation%20(Diskless)%20(DS1819+).jpg  http://share.dxz.plus/BlogContent/my-cloud-ex4100-Hero.png.thumb.1280.1280.png  结论 可以✅\n"
+},
+{
+	"uri": "http://dxz.plus/posts/emby/",
+	"title": "VPS 5分钟极速搭建emby服务",
+	"tags": ["docker", "emby", "rclone", "建站", "entertainment", "娱乐", "plex", "gdrive", "网盘", "谷歌", "server"],
+	"categories": [],
+	"series": [],
+	"description": "热门",
+	"content": "免费的虽然是最贵的，但是性价比却无可争议的+∞\n废话一堆 写这个教程是主要是为了测试docker搭建typecho，由于docker映射文件夹简直太方便了，所有网站数据分分钟打包，备份，搬家。适合我这样的瞎折腾。 更主要的，我们手里有n多垃圾小鸡，除了探针，网盘目录外还有别的骚法么？ 这篇文章带你骚。 基本上你的小鸡速度够快，尤其是晚上，比如北方联通用justhost，甲骨文之类的都可以非常爽快的试用这个方法。 由于是本地kodi解码，串流播放，服务器没啥压力，配置不需要多高，同时也没必要买emby专业版了，我的plex算是白买了，nas我还特意买的J3455服务端解码，看来也是浪费。 虽然读取的是gdrive电影，但是由于是vps搭建，host大法基本用不到了。并且这个emby个人服务应该不会触及红线，系统占用低，不用担心被各种ban(GFW\u0026amp;VPS providers) 5分钟也就是个标题，看看就好，熟练了也就10分钟以内就搞定。我一连气儿搭了3个服务，太爽了，不分享出来是不行的，憋着难受\nupdate 20210409 没想到这篇文章还挺多人看，下面回复邮箱的我就不一一通过了，自己选择申请加入00盘吧\n00新盘扫了一个emby的数据包\n使用放入如下\n首先挂载00盘到 /root/rclone/00alpha\nfclone mount 你的00盘rclone挂载: /root/rclone/00alpha --allow-non-empty --allow-other --vfs-cache-mode writes --dir-cache-time 2m --buffer-size 0M --vfs-read-chunk-size 64M --vfs-read-chunk-size-limit 256M -vvP  下载\u0026amp;解压emby数据包\nmkdir /root/disk tar -xvf /root/rclone/00alpha/scraper/00emby.tar -C /root/disk/  着急的话去掉-xvf中的v参数，关闭输出结果\n嗯，我可能打包的时候没有在 /root/disk/ 下，所有可能解压出来的是 root 目录，需要调整一下\n只要保证下一步 /root/disk/emby/config:/config 这个映射正确就行了\n冒号前面的 /root/disk/emby/config 目录根据刚才解压出来的emby/config文件夹 位置自己调整\ndocker emby\ndocker run --name=emby -d -v /root/disk/emby/config:/config -v /root/rclone/00alpha:/00 -p 8096:8096 -p 8920:8920 -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  访问 IP:8096\n用户名密码\ndxz\ndxz\n申请加入00ALPHA 「目前暂停加入，开放时间群组通知」\n注意按格式填写，否则不过\n安装必要命令 apt-get update apt-get install curl zip nano vim -y  搭建docker，Rclone 还是一键脚本\nDocker\ncurl -fsSL https://get.docker.com -o get-docker.sh sh get-docker.sh  发现为了兼顾锐速，选择debian8的情况下，上述脚本无法安装docker，那么手动安装如下： 添加源\nnano /etc/apt/sources.list  把下面几行填入\ndeb http://http.debian.net/debian jessie-backports main deb http://packages.dotdeb.org jessie all deb-src http://packages.dotdeb.org jessie all  更新源卸载老版本并安装稳定版docke-ce\napt-get update apt-get remove docker docker.io docker-engine containerd runc apt-get install \\ apt-transport-https \\ ca-certificates \\ curl \\ gnupg2 \\ software-properties-common curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add - add-apt-repository \\ \u0026quot;deb [arch=amd64] https://download.docker.com/linux/debian \\ $(lsb_release -cs) \\ stable\u0026quot; apt-get update apt-get install docker-ce  Rclone\n脚本，这个一般不会出错\ncurl https://rclone.org/install.sh | bash  如何vps挂载rclone 参看这个教程，我就不废话了\nhttps://wzfou.com/rclone-cos-fuse-ossfs/  建立必要目录 主要用到 root 目录下的/root/emby/config 和/root/rclone/00\ncd /root mkdir emby mkdir emby/config mkdir rclone mkdir rclone/00  00是我的rclone挂载的目录\n挂载rclone/00团队盘 更新 Feb 2, 2020 at 12:15:10 PM 看到好多人不知道怎么挂载团队盘，这里简单说一下\n首先你要加入00盘，最简单的方法到博客最下点击G+，自助加入\n然后在vps上面打开rclone的配置文件\nnano /root/.config/rclone/rclone.conf  再随便找一个已经加入00盘的账号的对应配置文件,复制一份黏贴到下面，底下加00盘的ID team_drive = 0ACflmF7V9qaJUk9PVA 如图 这时候挂载00就相当于挂载00团队盘了\n更新完毕 下面继续\n我挂载的是自己的团队盘，00替换成你自己的gdriveID\nrclone mount 00: /root/rclone/00 --allow-non-empty --allow-other --dir-cache-time 12h \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  在contab添加开机自动挂载\nnano /etc/crontab  添加一行\n@reboot root rclone mount 00: /root/rclone/00 --allow-non-empty --allow-other --dir-cache-time 12h \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp;  然后ctrl+x 按y 回车\n拉取镜像 docker run --name=emby -d -v /root/emby/config:/config -v /root/rclone/00:/00 -p 8096:8096 -p 8920:8920 -e UID=1000 -e GID=100 -e GIDLIST=100 --restart unless-stopped emby/embyserver:latest  增加虚拟内存 依旧是脚本\nwget https://www.moerats.com/usr/shell/swap.sh \u0026amp;\u0026amp; bash swap.sh  选1再填2000，因为我用的小鸡只有512m内存，不加虚拟内存的话，rclone挂载很容易掉线\n配置emby 浏览器输入IP:8096即可打开emby server 然后就是设置，记得新建用户的时候同时新建一个emby免费账号，并填入，后面客户端方便登陆。 需要注意的一点就是电影的目录选择你自己上面挂载好并映射到emby docker的目录/clone/ldfdsa00 emby串流 添加好电影目录并搜刮好以后就可以用kodi emby插件进行串流播放 先安装emby插件 登陆并选择之前建立的emby账号下的电影库，我在oracle小鸡搭建的，速度稳定40m，一般的电影都可以，少数4k rip电影也可以看 done update Dec 31, 2019 at 1:58:01 PM 茶先生的库和00同步更新，在00的茶先生目录，区别是里面包含nfo/图片/字幕。用法和00盘一样，除了字幕选上之外，其他全都不要选，直接扫。由于东西都在TD，因此本地小鸡要求硬盘会小很多，辣鸡专用。但缺点是加载图片速度略慢，但在忍受范围内。enjoy\n常见出错  提示FUSE error error: failed to mount FUSE fs: fusermount: exec: \u0026quot;fusermount\u0026quot;: executable file not found in $PATH  安装 sshfs\napt install sshfs -y  Kodi emby 插件 官方的embycon好像不灵，用这个备用源的\n如果rclone掉了 reboot就行 如果rclone账号api超限，需要换一个账号，挂载相同路径的（团队）盘目录 还是推荐embycon插件，这个虽然不能添加多服务器，但是稳定性好很多，资源占用少\n重新挂载gd 因为你可能刮削超过750G，所以有时候要换号继续刮削\numount /root/rclone/00 #卸载源目录 rclone mount gd（换成新账号，内部目录要匹配，要有 team_drive = 0ACflmF7V9qaJUk9PVA ）: /root/rclone/00 --allow-non-empty --allow-other --dir-cache-time 12h \u0026gt;/dev/null 2\u0026gt;\u0026amp;1 \u0026amp; #重新挂载 docker restart emby #重启emby server  挂载目录 挂载gd 容器内gd 有点乱， 来张图说明一下 挂载00电影盘 emby如下设置，可以扫00盘的电影和美剧，缩略图都扫好了，你只需设置自己喜欢的字幕即可\n效果 \u0026ndash;\n搭建在甲骨文免费vps上的emby server，完美运行\n 南方公园刮削的算是比较好的了  搞不定加群via频道主\n我们的电影库永久免费开放，私我你邮箱即可加入，我和群里的小朋友一起维护，一起备份，一直更新\n"
+},
+{
+	"uri": "http://dxz.plus/",
+	"title": "",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/5minutes/",
+	"title": "5minutes",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/autoscan/",
+	"title": "autoscan",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/",
+	"title": "Categories",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/emby/",
+	"title": "emby",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/gd/",
+	"title": "gd",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/github/",
+	"title": "Github",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/googledrive/",
+	"title": "googledrive",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/plex/",
+	"title": "plex",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/",
+	"title": "Posts",
+	"tags": ["index"],
+	"categories": [],
+	"series": [],
+	"description": "Post page",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/",
+	"title": "Tags",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/tutorial/",
+	"title": "tutorial",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/6%E7%9B%98/",
+	"title": "6盘",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/action/",
+	"title": "action",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/onedirve/",
+	"title": "onedirve",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E8%BD%AC%E5%AD%98/",
+	"title": "转存",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/packege/",
+	"title": "packege",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/pms/",
+	"title": "PMS",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%88%AE%E5%89%8A%E5%8C%85/",
+	"title": "刮削包",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/gost/",
+	"title": "gost",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/hosts/",
+	"title": "hosts",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/rclone/",
+	"title": "rclone",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/sni/",
+	"title": "sni",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/tinymediamanager/",
+	"title": "tinymediamanager",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/tmm/",
+	"title": "tmm",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%88%AE%E5%89%8A/",
+	"title": "刮削",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/cluster/",
+	"title": "cluster",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E9%9B%86%E7%BE%A4/",
+	"title": "集群",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/socks5/",
+	"title": "socks5",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%A5%97%E5%A8%83/",
+	"title": "套娃",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/notice/",
+	"title": "notice",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/telegram/",
+	"title": "telegram",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%85%AC%E5%91%8A/",
+	"title": "公告",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/%E5%85%AC%E5%91%8A/",
+	"title": "公告",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%BD%B1%E8%A7%86%E5%BA%93/",
+	"title": "影视库",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E7%BE%A4%E7%BB%84/",
+	"title": "群组",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E8%8C%B6%E5%85%88%E7%94%9F/",
+	"title": "茶先生",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/linux/",
+	"title": "linux",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/snap2html/",
+	"title": "snap2html",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/docker/",
+	"title": "docker",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/entertainment/",
+	"title": "entertainment",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/gdrive/",
+	"title": "gdrive",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/server/",
+	"title": "server",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%A8%B1%E4%B9%90/",
+	"title": "娱乐",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E7%BD%91%E7%9B%98/",
+	"title": "网盘",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E8%B0%B7%E6%AD%8C/",
+	"title": "谷歌",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/blog/",
+	"title": "blog",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/hugo/",
+	"title": "hugo",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/travis/",
+	"title": "travis",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%8D%9A%E5%AE%A2/",
+	"title": "博客",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/books/",
+	"title": "books",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/epub/",
+	"title": "epub",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/google/",
+	"title": "google",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/mobi/",
+	"title": "mobi",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/pdf/",
+	"title": "pdf",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/reddit/",
+	"title": "reddit",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/search/",
+	"title": "search",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/tips/",
+	"title": "tips",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/tips/",
+	"title": "tips",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/finalspeed/",
+	"title": "Finalspeed",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/vps/",
+	"title": "vps",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E7%94%B5%E4%BF%A1/",
+	"title": "电信",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E8%81%94%E9%80%9A/",
+	"title": "联通",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E8%B7%AF%E7%94%B1%E5%99%A8/",
+	"title": "路由器",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/cdn/",
+	"title": "CDN",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/cloudflare/",
+	"title": "cloudflare",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/ss/",
+	"title": "ss",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/tls/",
+	"title": "tls",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/trojan/",
+	"title": "trojan",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/v2ray/",
+	"title": "v2ray",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/free/",
+	"title": "free",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/oracle/",
+	"title": "oracle",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/autorclone/",
+	"title": "autorclone",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/folderclone/",
+	"title": "folderclone",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/host/",
+	"title": "host",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/host%E5%A4%A7%E6%B3%95/",
+	"title": "host大法",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/typecho/",
+	"title": "typecho",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/workers/",
+	"title": "workers",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/%E5%BB%BA%E7%AB%99/",
+	"title": "建站",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/archive/",
+	"title": "Archive",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "Archive Page",
+	"content": "archive page\n"
+},
+{
+	"uri": "http://dxz.plus/about/",
+	"title": "About",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "About Page",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/markdown/",
+	"title": "markdown",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/placeholder-text/",
+	"title": "Placeholder Text",
+	"tags": ["markdown", "text"],
+	"categories": [],
+	"series": [],
+	"description": "Lorem Ipsum Dolor Si Amet",
+	"content": "Lorem est tota propiore conpellat pectoribus de pectora summo.\nRedit teque digerit hominumque toris verebor lumina non cervice subde tollit usus habet Arctonque, furores quas nec ferunt. Quoque montibus nunc caluere tempus inhospita parcite confusaque translucet patri vestro qui optatis lumine cognoscere flos nubis! Fronde ipsamque patulos Dryopen deorum.\n Exierant elisi ambit vivere dedere Duce pollice Eris modo Spargitque ferrea quos palude  Rursus nulli murmur; hastile inridet ut ab gravi sententia! Nomine potitus silentia flumen, sustinet placuit petis in dilapsa erat sunt. Atria tractus malis.\n Comas hunc haec pietate fetum procerum dixit Post torum vates letum Tiresia Flumen querellas Arcanaque montibus omnes Quidem et  Vagus elidunt \nThe Van de Graaf Canon\nMane refeci capiebant unda mulcebat Victa caducifer, malo vulnere contra dicere aurato, ludit regale, voca! Retorsit colit est profanae esse virescere furit nec; iaculi matertera et visa est, viribus. Divesque creatis, tecta novat collumque vulnus est, parvas. Faces illo pepulere tempus adest. Tendit flamma, ab opes virum sustinet, sidus sequendo urbis.\nIubar proles corpore raptos vero auctor imperium; sed et huic: manus caeli Lelegas tu lux. Verbis obstitit intus oblectamina fixis linguisque ausus sperare Echionides cornuaque tenent clausit possit. Omnia putatur. Praeteritae refert ausus; ferebant e primus lora nutat, vici quae mea ipse. Et iter nil spectatae vulnus haerentia iuste et exercebat, sui et.\nEurytus Hector, materna ipsumque ut Politen, nec, nate, ignari, vernum cohaesit sequitur. Vel mitis temploque vocatus, inque alis, oculos nomen non silvis corpore coniunx ne displicet illa. Crescunt non unus, vidit visa quantum inmiti flumina mortis facto sic: undique a alios vincula sunt iactata abdita! Suspenderat ego fuit tendit: luna, ante urbem Propoetides parte.\n"
+},
+{
+	"uri": "http://dxz.plus/tags/text/",
+	"title": "text",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/pt/dir/fourth/",
+	"title": "Fourth",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "My fourth presentation",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/pt/",
+	"title": "Presentations",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "Presentation list with reveal.js",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/pt/third/",
+	"title": "Third",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "My third presentation",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/pt/second/",
+	"title": "Second",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "My second presentation",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/pt/first/",
+	"title": "First",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "My first presentation",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/diagram/",
+	"title": "diagram",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/test-viz/",
+	"title": "Viz support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "A hack to put Graphviz on the web.",
+	"content": "digraph G { subgraph cluster_0 { style=filled; color=lightgrey; node [style=filled,color=white]; a0 -\u0026gt; a1 -\u0026gt; a2 -\u0026gt; a3; label = \u0026quot;process #1\u0026quot;; } subgraph cluster_1 { node [style=filled]; b0 -\u0026gt; b1 -\u0026gt; b2 -\u0026gt; b3; label = \u0026quot;process #2\u0026quot;; color=blue } start -\u0026gt; a0; start -\u0026gt; b0; a1 -\u0026gt; b3; b2 -\u0026gt; a3; a3 -\u0026gt; a0; a3 -\u0026gt; end; b3 -\u0026gt; end; start [shape=Mdiamond]; end [shape=Msquare]; } "
+},
+{
+	"uri": "http://dxz.plus/posts/test-wavedrom/",
+	"title": "Wavedrom support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "WaveDrom is a Free and Open Source online digital timing diagram (waveform) rendering engine that uses javascript, HTML5 and SVG to convert a WaveJSON input text description into SVG vector graphics.",
+	"content": "{ \u0026quot;signal\u0026quot;: [ {\u0026quot;name\u0026quot;: \u0026quot;CLK\u0026quot;, \u0026quot;wave\u0026quot;: \u0026quot;p.....|...\u0026quot;}, {\u0026quot;name\u0026quot;:\u0026quot;DAT\u0026quot;, \u0026quot;wave\u0026quot;:\u0026quot;x.345x|=.x\u0026quot;, \u0026quot;data\u0026quot;:[\u0026quot;A\u0026quot;,\u0026quot;B\u0026quot;,\u0026quot;C\u0026quot;,\u0026quot;D\u0026quot;]}, {\u0026quot;name\u0026quot;: \u0026quot;REQ\u0026quot;, \u0026quot;wave\u0026quot;: \u0026quot;0.1..0|1.0\u0026quot;}, {}, {\u0026quot;name\u0026quot;: \u0026quot;ACK\u0026quot;, \u0026quot;wave\u0026quot;: \u0026quot;1.....|01.\u0026quot;} ]} "
+},
+{
+	"uri": "http://dxz.plus/posts/test-chartjs/",
+	"title": "Chart support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Simple yet flexible JavaScript charting for designers &amp; developers",
+	"content": "{ \u0026quot;type\u0026quot;: \u0026quot;bar\u0026quot;, \u0026quot;data\u0026quot;: { \u0026quot;labels\u0026quot;: [\u0026quot;One\u0026quot;, \u0026quot;Two\u0026quot;, \u0026quot;Three\u0026quot;, \u0026quot;Four\u0026quot;, \u0026quot;Five\u0026quot;, \u0026quot;Six\u0026quot;], \u0026quot;datasets\u0026quot;: [{ \u0026quot;label\u0026quot;: \u0026quot;# of Votes\u0026quot;, \u0026quot;data\u0026quot;: [12, 19, 3, 5, 3, 8] }] } } { \u0026quot;type\u0026quot;: \u0026quot;line\u0026quot;, \u0026quot;data\u0026quot;: { \u0026quot;labels\u0026quot;: [\u0026quot;One\u0026quot;, \u0026quot;Two\u0026quot;, \u0026quot;Three\u0026quot;, \u0026quot;Four\u0026quot;, \u0026quot;Five\u0026quot;, \u0026quot;Six\u0026quot;], \u0026quot;datasets\u0026quot;: [ { \u0026quot;label\u0026quot;: \u0026quot;# of Votes\u0026quot;, \u0026quot;data\u0026quot;: [12, 19, 3, 5, 2, 3], \u0026quot;backgroundColor\u0026quot;:\u0026quot;transparent\u0026quot;, \u0026quot;borderColor\u0026quot;:\u0026quot;orange\u0026quot; }, { \u0026quot;label\u0026quot;: \u0026quot;Some other set\u0026quot;, \u0026quot;data\u0026quot;: [15, 8, 13, 5, 5, 9], \u0026quot;backgroundColor\u0026quot;:\u0026quot;transparent\u0026quot;, \u0026quot;borderColor\u0026quot;:\u0026quot;#44ccff\u0026quot; } ] } } "
+},
+{
+	"uri": "http://dxz.plus/posts/test-js-sequence-diagrams/",
+	"title": "JS Sequence Diagram support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Generates UML sequence diagrams from simple text",
+	"content": "Alice-\u0026gt;Bob: Hello Bob, how are you? Note right of Bob: Bob thinks Bob--\u0026gt;Alice: I am good thanks! Title: Here is a title A-\u0026gt;B: Normal line B--\u0026gt;C: Dashed line C-\u0026gt;\u0026gt;D: Open arrow D--\u0026gt;\u0026gt;A: Dashed open arrow "
+},
+{
+	"uri": "http://dxz.plus/tags/diagram/",
+	"title": "diagram",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/test-mermaid/",
+	"title": "Mermaid support",
+	"tags": ["diagram"],
+	"categories": [],
+	"series": [""],
+	"description": "Generate diagrams, charts, graphs or flows from markdown-like text via javascript.",
+	"content": "graph TD; A--\u0026gt;B; A--\u0026gt;C; B--\u0026gt;D; C--\u0026gt;D; graph TD; A--\u0026gt;B; A--\u0026gt;C; B--\u0026gt;D; C--\u0026gt;D; graph TD; A--\u0026gt;B; A--\u0026gt;C; B--\u0026gt;D; C--\u0026gt;D; sequenceDiagram participant Alice participant Bob Alice-\u0026gt;John: Hello John, how are you? loop Healthcheck John-\u0026gt;John: Fight against hypochondria end Note right of John: Rational thoughts \u0026lt;br/\u0026gt;prevail... John--\u0026gt;Alice: Great! John-\u0026gt;Bob: How about you? Bob--\u0026gt;John: Jolly good! graph TD A[Hard] --\u0026gt;|Text| B(Round) B --\u0026gt; C{Decision} C --\u0026gt;|One| D[Result 1] C --\u0026gt;|Two| E[Result 2] gantt section Section Completed :done, des1, 2014-01-06,2014-01-08 Active :active, des2, 2014-01-07, 3d Parallel 1 : des3, after des1, 1d Parallel 2 : des4, after des1, 1d Parallel 3 : des5, after des3, 1d Parallel 4 : des6, after des4, 1d classDiagram Class01 \u0026lt;|-- AveryLongClass : Cool \u0026lt;\u0026lt;interface\u0026gt;\u0026gt; Class01 Class09 --\u0026gt; C2 : Where am i? Class09 --* C3 Class09 --|\u0026gt; Class07 Class07 : equals() Class07 : Object[] elementData Class01 : size() Class01 : int chimp Class01 : int gorilla class Class10 { \u0026lt;\u0026lt;service\u0026gt;\u0026gt; int id size() } stateDiagram [*] --\u0026gt; Still Still --\u0026gt; [*] Still --\u0026gt; Moving Moving --\u0026gt; Still Moving --\u0026gt; Crash Crash --\u0026gt; [*] pie \u0026quot;Dogs\u0026quot; : 386 \u0026quot;Cats\u0026quot; : 85 \u0026quot;Rats\u0026quot; : 15 "
+},
+{
+	"uri": "http://dxz.plus/categories/math/",
+	"title": "math",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/test-mathjax/",
+	"title": "MathJax support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "A JavaScript display engine for mathematics that works in all browsers.No more setup for readers. It just works.",
+	"content": "When \\(a \\ne 0\\), there are two solutions to \\((ax^2 + bx + c = 0)\\) and they are \\[x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.\\]\n"
+},
+{
+	"uri": "http://dxz.plus/posts/test-katext/",
+	"title": "Katex support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "KaTeX is a fast, easy-to-use JavaScript library for TeX math rendering on the web.",
+	"content": "The following\n$$ \\int_{a}^{b} x^2 dx $$\nIs an integral\n$$ \\varphi = 1+\\frac{1} {1+\\frac{1} {1+\\frac{1} {1+\\cdots} } } $$\nEnable Katex in the config file by setting the katex param to true. This will import the necessary Katex CSS/JS.\nSee the online reference of supported TeX functions.\nNote: For inline math to render correctly, your content file extension must be .mmark. See the official mmark site.\nInline math: $$ \\varphi = \\dfrac{1+\\sqrt5}{2}= 1.6180339887… $$ Inline math: $$ \\varphi = \\dfrac{1+\\sqrt5}{2}= 1.6180339887… $$\nBlock math: $$ \\varphi = 1+\\frac{1} {1+\\frac{1} {1+\\frac{1} {1+\\cdots} } } $$ Block math:\n$$ \\varphi = 1+\\frac{1} {1+\\frac{1} {1+\\frac{1} {1+\\cdots} } } $$\n"
+},
+{
+	"uri": "http://dxz.plus/posts/test-flowchart/",
+	"title": "Flowchart support",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "flowchart.js is a flowchart DSL and SVG render that runs in the browser and terminal. Nodes and connections are defined in separately so that nodes can be reused and connections can be quickly changed.",
+	"content": "st=\u0026gt;start: Start|past:\u0026gt;http://www.google.com[blank] e=\u0026gt;end: End|future:\u0026gt;http://www.google.com op1=\u0026gt;operation: My Operation|past op2=\u0026gt;operation: Stuff|current sub1=\u0026gt;subroutine: My Subroutine|invalid cond=\u0026gt;condition: Yes or No?|approved:\u0026gt;http://www.google.com c2=\u0026gt;condition: Good idea|rejected io=\u0026gt;inputoutput: catch something...|future st-\u0026gt;op1(right)-\u0026gt;cond cond(yes, right)-\u0026gt;c2 cond(no)-\u0026gt;sub1(left)-\u0026gt;op1 c2(yes)-\u0026gt;io-\u0026gt;e c2(no)-\u0026gt;op2-\u0026gt;e "
+},
+{
+	"uri": "http://dxz.plus/gallery/",
+	"title": "Galleries",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/gallery/photo/",
+	"title": "Photo",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "포토 갤러리",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/gallery/cartoon/",
+	"title": "Cartoon",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "cartoon gallery",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/css/",
+	"title": "css",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/html/",
+	"title": "html",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/markdown-syntax/",
+	"title": "Markdown Syntax Guide",
+	"tags": ["markdown", "css", "html", "themes"],
+	"categories": [],
+	"series": ["Themes Guide"],
+	"description": "Sample article showcasing basic Markdown syntax and formatting for HTML elements.",
+	"content": "This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.\nHeadings The following HTML \u0026lt;h1\u0026gt;—\u0026lt;h6\u0026gt; elements represent six levels of section headings. \u0026lt;h1\u0026gt; is the highest section level while \u0026lt;h6\u0026gt; is the lowest.\nH1 H2 H3 H4 H5 H6 Paragraph Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.\nItatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.\nBlockquotes The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a footer or cite element, and optionally with in-line changes such as annotations and abbreviations.\nBlockquote without attribution  Tiam, ad mint andaepu dandae nostion secatur sequo quae. Note that you can use Markdown syntax within a blockquote.\n Blockquote with attribution  Don\u0026rsquo;t communicate by sharing memory, share memory by communicating.\n— Rob Pike1\n Tables Tables aren\u0026rsquo;t part of the core Markdown spec, but Hugo supports supports them out-of-the-box.\n   Name Age     Bob 27   Alice 23    Inline Markdown within tables    Inline  Markdown  In  Table     italics bold strikethrough  code    Code Blocks Code block with backticks html \u0026lt;!DOCTYPE html\u0026gt; \u0026lt;html lang=\u0026quot;en\u0026quot;\u0026gt; \u0026lt;head\u0026gt; \u0026lt;meta charset=\u0026quot;UTF-8\u0026quot;\u0026gt; \u0026lt;title\u0026gt;Example HTML5 Document\u0026lt;/title\u0026gt; \u0026lt;/head\u0026gt; \u0026lt;body\u0026gt; \u0026lt;p\u0026gt;Test\u0026lt;/p\u0026gt; \u0026lt;/body\u0026gt; \u0026lt;/html\u0026gt; Code block indented with four spaces \u0026lt;!DOCTYPE html\u0026gt; \u0026lt;html lang=\u0026quot;en\u0026quot;\u0026gt; \u0026lt;head\u0026gt; \u0026lt;meta charset=\u0026quot;UTF-8\u0026quot;\u0026gt; \u0026lt;title\u0026gt;Example HTML5 Document\u0026lt;/title\u0026gt; \u0026lt;/head\u0026gt; \u0026lt;body\u0026gt; \u0026lt;p\u0026gt;Test\u0026lt;/p\u0026gt; \u0026lt;/body\u0026gt; \u0026lt;/html\u0026gt;  Code block with Hugo\u0026rsquo;s internal highlight shortcode 1 2 3 4 5 6 7 8 9 10  \u0026lt;!DOCTYPE html\u0026gt; \u0026lt;html lang=\u0026#34;en\u0026#34;\u0026gt; \u0026lt;head\u0026gt; \u0026lt;meta charset=\u0026#34;UTF-8\u0026#34;\u0026gt; \u0026lt;title\u0026gt;Example HTML5 Document\u0026lt;/title\u0026gt; \u0026lt;/head\u0026gt; \u0026lt;body\u0026gt; \u0026lt;p\u0026gt;Test\u0026lt;/p\u0026gt; \u0026lt;/body\u0026gt; \u0026lt;/html\u0026gt;   List Types Ordered List  First item Second item Third item  Unordered List  List item Another item And another item  Nested list  Item   First Sub-item Second Sub-item  Other Elements — abbr, sub, sup, kbd, mark GIF is a bitmap image format.\nH2O\nXn + Yn = Zn\nPress CTRL+ALT+Delete to end the session.\nMost salamanders are nocturnal, and hunt for insects, worms, and other small creatures.\n  The above quote is excerpted from Rob Pike\u0026rsquo;s talk during Gopherfest, November 18, 2015.\u0026#160;\u0026#x21a9;\u0026#xfe0e;\n  "
+},
+{
+	"uri": "http://dxz.plus/series/",
+	"title": "Series",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/syntax/",
+	"title": "syntax",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/themes/",
+	"title": "themes",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/themes/",
+	"title": "themes",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/series/themes-guide/",
+	"title": "Themes Guide",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/math-typesetting/",
+	"title": "Math Typesetting",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "A brief guide to setup KaTeX",
+	"content": "Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.\nIn this example we will be using KaTeX\n Create a partial under /layouts/partials/math.html Within this partial reference the Auto-render Extension or host these scripts locally. Include the partial in your templates like so:  {{ if or .Params.math .Site.Params.math }} {{ partial \u0026quot;math.html\u0026quot; . }} {{ end }}  To enable KaTex globally set the parameter math to true in a project\u0026rsquo;s configuration To enable KaTex on a per page basis include the parameter math: true in content files.  Note: Use the online reference of Supported TeX Functions\nExamples Inline math: $$ \\varphi = \\dfrac{1+\\sqrt5}{2}= 1.6180339887… $$\nBlock math:\n$$ \\varphi = 1+\\frac{1} {1+\\frac{1} {1+\\frac{1} {1+\\cdots} } } $$\n"
+},
+{
+	"uri": "http://dxz.plus/tags/amoji/",
+	"title": "amoji",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/bamoji/",
+	"title": "bamoji",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/emoji/",
+	"title": "emoji",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/posts/emoji-support/",
+	"title": "Emoji Support",
+	"tags": ["emoji", "gamoji", "namoji", "bamoji", "amoji"],
+	"categories": [],
+	"series": [],
+	"description": "Guide to emoji usage in Hugo",
+	"content": "Emoji can be enabled in a Hugo project in a number of ways.\nThe emojify function can be called directly in templates or Inline Shortcodes.\nTo enable emoji globally, set enableEmoji to true in your site’s configuration and then you can type emoji shorthand codes directly in content files; e.g.\n🙈 🙈 🙉 🙉 🙊 🙊\nThe Emoji cheat sheet is a useful reference for emoji shorthand codes.\n N.B. The above steps enable Unicode Standard emoji characters and sequences in Hugo, however the rendering of these glyphs depends on the browser and the platform. To style the emoji you can either use a third party emoji font or a font stack; e.g.\n1 2 3  .emoji { font-family: Apple Color Emoji,Segoe UI Emoji,NotoColorEmoji,Segoe UI Symbol,Android Emoji,EmojiSymbols; }  "
+},
+{
+	"uri": "http://dxz.plus/tags/gamoji/",
+	"title": "gamoji",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/namoji/",
+	"title": "namoji",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/hugo/",
+	"title": "hugo",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/notes/",
+	"title": "Notes",
+	"tags": ["index"],
+	"categories": [],
+	"series": [],
+	"description": "Note page",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/notes/hugo/syntax-highlight/",
+	"title": "Syntax highlighting",
+	"tags": ["hugo"],
+	"categories": [],
+	"series": [""],
+	"description": "Syntax highlighting test",
+	"content": "Dolore in consectetur irure qui laborum. Adipisicing cillum ad laboris dolor. Quis consectetur ullamco esse ad mollit anim sint nostrud esse. Irure voluptate ex fugiat voluptate ea fugiat laboris.\n This is a blockqute.\n  line\n line\nCode Syntax Highlighting Verify the following code blocks render as code blocks and highlight properly.\nDiff 1 2 3 4 5 6 7 8 9 10  *** /path/to/original\t\u0026#39;\u0026#39;timestamp\u0026#39;\u0026#39; --- /path/to/new\t\u0026#39;\u0026#39;timestamp\u0026#39;\u0026#39; *************** *** 1 **** ! This is a line. --- 1 --- ! This is a replacement line. It is important to spell -removed line +new line   Makefile 1 2 3 4 5  CC=gcc CFLAGS=-I. hellomake: hellomake.o hellofunc.o $(CC) -o hellomake hellomake.o hellofunc.o -I.   JSON 1 2 3  {\u0026#34;employees\u0026#34;:[ {\u0026#34;firstName\u0026#34;:\u0026#34;John\u0026#34;, \u0026#34;lastName\u0026#34;:\u0026#34;Doe\u0026#34;}, ]}   Markdown 1 2 3  **bold** *italics* [link](www.example.com)   JavaScript 1  document.write(\u0026#39;Hello, world!\u0026#39;);   CSS 1 2 3  body { background-color: red; }   Objective C 1 2 3 4 5 6  #import \u0026lt;stdio.h\u0026gt;  int main (void) { printf (\u0026#34;Hello world!\\n\u0026#34;); }   Python 1  print \u0026#34;Hello, world!\u0026#34;   XML 1 2 3 4 5  \u0026lt;employees\u0026gt; \u0026lt;employee\u0026gt; \u0026lt;firstName\u0026gt;John\u0026lt;/firstName\u0026gt; \u0026lt;lastName\u0026gt;Doe\u0026lt;/lastName\u0026gt; \u0026lt;/employee\u0026gt; \u0026lt;/employees\u0026gt;   Perl 1  print \u0026#34;Hello, World!\\n\u0026#34;;   Bash 1  echo \u0026#34;Hello World\u0026#34;   PHP 1  \u0026lt;?php echo \u0026#39;\u0026lt;p\u0026gt;Hello World\u0026lt;/p\u0026gt;\u0026#39;; ?\u0026gt;  CoffeeScript 1  console.log(“Hello world!”);   C# 1 2 3 4 5 6 7 8  using System; class Program { public static void Main(string[] args) { Console.WriteLine(\u0026#34;Hello, world!\u0026#34;); } }   C++ 1 2 3 4 5 6 7  #include \u0026lt;iostream.h\u0026gt; main() { cout \u0026lt;\u0026lt; \u0026#34;Hello World!\u0026#34;; return 0; }   SQL 1 2  SELECTcolumn_name,column_nameFROMtable_name;  Go 1 2 3 4 5  package main import \u0026#34;fmt\u0026#34; func main() { fmt.Println(\u0026#34;Hello, 世界\u0026#34;) }   Ruby 1  puts \u0026#34;Hello, world!\u0026#34;   Java 1 2 3 4 5 6 7 8 9 10 11 12  import javax.swing.JFrame; //Importing class JFrame import javax.swing.JLabel; //Importing class JLabel public class HelloWorld { public static void main(String[] args) { JFrame frame = new JFrame(); //Creating frame  frame.setTitle(\u0026#34;Hi!\u0026#34;); //Setting title frame  frame.add(new JLabel(\u0026#34;Hello, world!\u0026#34;));//Adding text to frame  frame.pack(); //Setting size to smallest  frame.setLocationRelativeTo(null); //Centering frame  frame.setVisible(true); //Showing frame  } }   Latex Equation 1  \\frac{d}{dx}\\left( \\int_{0}^{x} f(u)\\,du\\right)=f(x).   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38  import {x, y} as p from \u0026#39;point\u0026#39;; const ANSWER = 42; class Car extends Vehicle { constructor(speed, cost) { super(speed); var c = Symbol(\u0026#39;cost\u0026#39;); this[c] = cost; this.intro = `This is a car runs at ${speed}.`; } } for (let num of [1, 2, 3]) { console.log(num + 0b111110111); } function $initHighlight(block, flags) { try { if (block.className.search(/\\bno\\-highlight\\b/) != -1) return processBlock(block.function, true, 0x0F) + \u0026#39; class=\u0026#34;\u0026#34;\u0026#39;; } catch (e) { /* handle exception */ var e4x = \u0026lt;div\u0026gt;Example \u0026lt;p\u0026gt;1234\u0026lt;/p\u0026gt;\u0026lt;/div\u0026gt;; } for (var i = 0 / 2; i \u0026lt; classes.length; i++) { // \u0026#34;0 / 2\u0026#34; should not be parsed as regexp  if (checkCondition(classes[i]) === undefined) return /\\d+[\\s/]/g; } console.log(Array.every(classes, Boolean)); } export $initHighlight;   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  \u0026lt;!DOCTYPE html\u0026gt; \u0026lt;html lang=\u0026#34;en\u0026#34;\u0026gt; \u0026lt;head\u0026gt; \u0026lt;meta charset=\u0026#34;utf-8\u0026#34;\u0026gt; \u0026lt;title\u0026gt;Hello world\u0026lt;/title\u0026gt; \u0026lt;link href=\u0026#39;http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic\u0026#39; rel=\u0026#39;stylesheet\u0026#39; type=\u0026#39;text/css\u0026#39;\u0026gt; \u0026lt;link rel=\u0026#34;stylesheet\u0026#34; href=\u0026#34;index.css\u0026#34; /\u0026gt; \u0026lt;/head\u0026gt; \u0026lt;body\u0026gt; \u0026lt;div id=\u0026#34;app\u0026#34;\u0026gt;\u0026lt;/div\u0026gt; \u0026lt;script src=\u0026#34;//cdnjs.cloudflare.com/ajax/libs/less.js/2.5.1/less.min.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;script src=\u0026#34;vendor/prism.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;script src=\u0026#34;examples.bundle.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;/body\u0026gt; \u0026lt;/html\u0026gt;   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41  /********************************************************* * General */ pre[class*=\u0026#34;language-\u0026#34;], code { color: #5c6e74; font-size: 13px; text-shadow: none; font-family: Consolas, Monaco, \u0026#39;Andale Mono\u0026#39;, \u0026#39;Ubuntu Mono\u0026#39;, monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 4; hyphens: none; } pre[class*=\u0026#34;language-\u0026#34;]::selection, code::selection { text-shadow: none; background: #b3d4fc; } @media print { pre[class*=\u0026#34;language-\u0026#34;], code { text-shadow: none; } } pre[class*=\u0026#34;language-\u0026#34;] { padding: 1em; margin: .5em 0; overflow: auto; background: #f8f5ec; } :not(pre) \u0026gt; code { padding: .1em .3em; border-radius: .3em; color: #db4c69; background: #f9f2f4; }   "
+},
+{
+	"uri": "http://dxz.plus/tags/blogging/",
+	"title": "Blogging",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/categories/ctest/",
+	"title": "cTest",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/development/",
+	"title": "Development",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/fast/",
+	"title": "fast",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/tags/go/",
+	"title": "Go",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/series/go-web-dev/",
+	"title": "Go Web Dev",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/note-1/",
+	"title": "Note-1",
+	"tags": ["Development", "Go", "fast", "Blogging"],
+	"categories": [],
+	"series": ["Go Web Dev"],
+	"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+	"content": "post-1 content Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis, bibendum massa et, bibendum enim. Nunc eu augue quis ante porta sodales. Mauris vel faucibus magna, dictum sagittis dolor. Nam scelerisque malesuada efficitur. Donec consequat sodales justo, ut aliquam ligula maximus nec. Quisque metus tellus, tincidunt eu consequat consequat, placerat sed ante. Cras pulvinar eros ex, vel luctus eros viverra sed. Donec nec quam aliquam, ultricies neque sed, sollicitudin lorem. Aenean faucibus, velit et facilisis semper, leo tellus pellentesque orci, non suscipit libero ipsum sed lacus. Fusce pharetra arcu sed tellus convallis, vel hendrerit turpis rhoncus.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/note-2/",
+	"title": "Note-2",
+	"tags": ["Go", "fast", "Blogging"],
+	"categories": [],
+	"series": ["Go Web Dev"],
+	"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis,",
+	"content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis, bibendum massa et, bibendum enim. Nunc eu augue quis ante porta sodales. Mauris vel faucibus magna, dictum sagittis dolor. Nam scelerisque malesuada efficitur. Donec consequat sodales justo, ut aliquam ligula maximus nec.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/note-3/",
+	"title": "Note-3",
+	"tags": ["Development", "Go", "fast"],
+	"categories": [],
+	"series": ["Go Web Dev"],
+	"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis,",
+	"content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis, bibendum massa et, bibendum enim. Nunc eu augue quis ante porta sodales. Mauris vel faucibus magna, dictum sagittis dolor. Nam scelerisque malesuada efficitur. Donec consequat sodales justo, ut aliquam ligula maximus nec.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/go/go-1/go-1-1/go-1/",
+	"title": "Go 1",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Go 1 Description",
+	"content": "Dolore in consectetur irure qui laborum. Adipisicing cillum ad laboris dolor. Quis consectetur ullamco esse ad mollit anim sint nostrud esse. Irure voluptate ex fugiat voluptate ea fugiat laboris.\nVeniam deserunt ex ullamco laboris et elit culpa enim. Irure ipsum dolore sint nisi aliquip labore fugiat magna esse ad nostrud in. Eu aliqua mollit tempor proident pariatur voluptate.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/go/go-1/go-2/",
+	"title": "Go 2",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Go 2 Description",
+	"content": "Dolore in consectetur irure qui laborum. Adipisicing cillum ad laboris dolor. Quis consectetur ullamco esse ad mollit anim sint nostrud esse. Irure voluptate ex fugiat voluptate ea fugiat laboris.\nVeniam deserunt ex ullamco laboris et elit culpa enim. Irure ipsum dolore sint nisi aliquip labore fugiat magna esse ad nostrud in. Eu aliqua mollit tempor proident pariatur voluptate.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/go/go-4/",
+	"title": "Go 4",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Go 4 Description",
+	"content": "Dolore in consectetur irure qui laborum. Adipisicing cillum ad laboris dolor. Quis consectetur ullamco esse ad mollit anim sint nostrud esse. Irure voluptate ex fugiat voluptate ea fugiat laboris.\nVeniam deserunt ex ullamco laboris et elit culpa enim. Irure ipsum dolore sint nisi aliquip labore fugiat magna esse ad nostrud in. Eu aliqua mollit tempor proident pariatur voluptate.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/go/go-1/go-1-1/go-1-1-1/go-5/",
+	"title": "Go 5",
+	"tags": [""],
+	"categories": [],
+	"series": [""],
+	"description": "Go 5 Description",
+	"content": "Dolore in consectetur irure qui laborum. Adipisicing cillum ad laboris dolor. Quis consectetur ullamco esse ad mollit anim sint nostrud esse. Irure voluptate ex fugiat voluptate ea fugiat laboris.\nVeniam deserunt ex ullamco laboris et elit culpa enim. Irure ipsum dolore sint nisi aliquip labore fugiat magna esse ad nostrud in. Eu aliqua mollit tempor proident pariatur voluptate.\n"
+},
+{
+	"uri": "http://dxz.plus/notes/sublist/",
+	"title": "Sub List",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "Note Sub List",
+	"content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget enim lobortis, bibendum massa et, bibendum enim. Nunc eu augue quis ante porta sodales. Mauris vel faucibus magna, dictum sagittis dolor. Nam scelerisque malesuada efficitur. Donec consequat sodales justo, ut aliquam ligula maximus nec.\n"
+},
+{
+	"uri": "http://dxz.plus/tags/index/",
+	"title": "index",
+	"tags": [],
+	"categories": [],
+	"series": [],
+	"description": "",
+	"content": ""
+}]

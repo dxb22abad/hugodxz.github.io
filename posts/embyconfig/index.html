@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Emby Docker 数据库操作 – 学渣的世界</title>
+    
+
+<script>
+  
+  var runSearch = function() {    
+    
+    var searchLanguages = JSON.parse("[\"en\"]");
+    
+        var baseurl = "http:\/\/dxz.plus\/";
+    
+
+    if (!searchLanguages) {
+      searchLanguages = ['en'];
+    }
+
+    var lunrIndex = null;
+    var pagesIndex = null;
+    var searchResults = null;
+    var searchMenu = null;
+
+    function endsWith(str, suffix) {
+      return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+
+    function initLunr() {
+      if (!endsWith(baseurl, "/")) {
+        baseurl = baseurl + '/';
+      };
+
+      $.getJSON(baseurl + "index.json")
+        .done(function (index) {
+          pagesIndex = index;
+          lunrIndex = lunr(function () {
+            this.use(lunr.multiLanguage(...searchLanguages));
+            this.ref('uri');
+            this.field('title');
+            this.field('description');
+            this.field('content');
+            
+            
+            
+
+            var that = this;
+            index.forEach(function (page) {
+              that.add(page);
+            });
+          });
+        })
+        .fail(function (jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.error("Error getting Hugo index file:", err);
+        });
+    }
+
+    function search(query) {
+      return lunrIndex.search(query).map(function (result) {
+        return pagesIndex.filter(function (page) {
+          return page.uri === result.ref;
+        })[0];
+      });
+    }
+
+    function renderSearchResults(results) {
+      searchResults = document.getElementById('search-results');
+      searchMenu = document.getElementById('search-menu');
+      searchResults.setAttribute('class', 'dropdown is-active');
+
+      var content = document.createElement('div');
+      content.setAttribute('class', 'dropdown-content search-content');
+
+      if (results.length > 0) {
+        results.forEach(function (result) {
+          var item = document.createElement('a');
+          item.setAttribute('href', result.uri);
+          item.setAttribute('class', 'dropdown-item');
+          item.innerHTML = `<div class="menu-item"><div class="menu-item__title">📄 ${result.title}</div><div class="menu-item__desc">${result.description ? result.description : result.content}</div></div>`;
+          content.appendChild(item);
+        });
+      } else {
+        var item = document.createElement('span');
+        item.setAttribute('class', 'dropdown-item');
+        item.innerText = 'No results found';
+        content.appendChild(item);
+      }
+
+      while (searchMenu.hasChildNodes()) {
+        searchMenu.removeChild(
+          searchMenu.lastChild
+        );
+      }
+      searchMenu.appendChild(content);
+    }
+
+    function renderSearchResultsMobile(results) {
+      searchResults = document.getElementById('search-mobile-results');
+
+      var content = document.createElement('div');
+      content.setAttribute('class', 'mobile-search__content');
+
+      if (results.length > 0) {
+        results.forEach(function (result) {
+          var item = document.createElement('a');
+          item.setAttribute('href', result.uri);
+          item.innerHTML = `<div class="mobile-search__item"><div class="mobile-search__item--title">📄 ${result.title}</div><div class="mobile-search__item--desc">${result.description ? result.description : result.content}</div></div>`;
+          content.appendChild(item);
+        });
+      } else {
+        var item = document.createElement('span');
+        content.appendChild(item);
+      }
+
+      $('#search-mobile-results').empty();
+      searchResults.appendChild(content);
+    }
+
+    initLunr();
+
+    $("#search").on('input', function (e) {
+      if (!e.target.value) {
+        $('#search-results').attr('class', 'dropdown');
+        return null;
+      }
+
+      if ($(window).width() < 770) {
+        return null;
+      } 
+
+      var results = search(e.target.value);
+      renderSearchResults(results);
+    });
+
+    $('#search').on('blur', function () {
+      if ($(window).width() < 770) {
+        return null;
+      }
+      setTimeout(function () {
+        $('#search-results').attr('class', 'dropdown');
+      }, 100);
+    });
+
+    $('#search').on('click', function (e) {
+      if ($(window).width() < 770) {
+        return null;
+      }
+      if (!e.target.value) {
+        $('#search-results').attr('class', 'dropdown');
+        return null;
+      }
+      var results = search(e.target.value);
+      renderSearchResults(results);
+    });
+
+    $('#search').on('keydown', function (e) {
+      if ($(window).width() < 770) {
+        return null;
+      }
+      var items = $('#search-menu .dropdown-item');
+      var activeIndex = $('#search-menu .dropdown-item.is-active').index();
+
+      items.removeClass('is-active');
+      if (e.key === 'ArrowDown') {
+        items.eq(activeIndex + 1).addClass('is-active');
+      } else if (e.key === 'ArrowUp') {
+        items.eq(activeIndex - 1).addClass('is-active');
+      } else if (e.key === 'Enter') {
+        var currentItemLink = items.eq(activeIndex).attr('href');
+        if (currentItemLink) {
+          location.href = currentItemLink;
+        }
+      }
+    });
+
+    $("#search-mobile").on('input', function(e) {
+      if (!e.target.value) {
+        $('#search-mobile-results').empty();
+        return null;
+      }
+
+      var results = search(e.target.value);
+      renderSearchResultsMobile(results);
+    });
+  }
+</script>    
+    
+
+
+<link rel="stylesheet" href="/css/main.min.css">
+
+
+    <meta name="description" content="热门" />
+<meta name="keywords" content="docker,emby,rclone,entertainment,娱乐,plex,gdrive,网盘,谷歌,server">
+<meta name="created" content="2019-12-20T22:09:50&#43;0000">
+<meta name="modified" content="2019-12-20T22:09:50&#43;0000">
+<meta name="author" content="金牌大学渣">
+
+<meta property="og:site_name" content="学渣的世界">
+<meta property="og:title" content="Emby Docker 数据库操作">
+<meta property="og:url" content="http://dxz.plus/posts/embyconfig/">
+<meta property="og:type" content="article">
+
+<meta name="generator" content="Hugo 0.92.1" />
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="canonical" href="http://dxz.plus/posts/embyconfig/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "headline": "Emby Docker 数据库操作",
+    "datePublished": "2019-12-20T22:09:50Z",
+    "dateModified": "2019-12-20T22:09:50Z",
+    "url" : "http://dxz.plus/posts/embyconfig/",
+    "description": "热门",
+    "keywords": ["docker","emby","rclone","entertainment","娱乐","plex","gdrive","网盘","谷歌","server"],
+    "author": {
+      "@type": "Person",
+      "name": "金牌大学渣"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://dxz.plus/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "学渣的世界",
+      "url": "http://dxz.plus/"
+    }
+  }
+</script>
+
+    
+
+
+
+
+
+    
+</head>
+
+<body id="root" class="theme__dark">
+    <script>
+        var localTheme = localStorage.getItem('theme');
+        if (localTheme) {
+            document.getElementById('root').className = `theme__${localTheme}`;
+        }        
+    </script>    
+    
+    <div id="body">
+        
+        <div class="container wrapper">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar__brand">
+    
+    <a href="/" title="Home" rel="home" class="navbar__logo-link">
+      <img data-src="/logo.png" src="data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48px' height='48px'%3E%3Cpath fill='%2337474f' d='M24.648,4l0.29,0.002c0.52,0.008,1.23,0.109,1.857,0.198c0.314,0.045,0.616,0.088,0.883,0.119 c0.164,0.024,0.715,0.227,1.043,0.348C29.468,4.941,32,6.875,32,6.875L31,5c0,0,1.563,0.445,2.125,0.875C34.247,6.733,34.354,7,35,7 h0.375L35,6c0.375,0.19,1.78,1.289,1.968,1.541L37,7.583l0.036,0.039c1.411,1.495,2.095,2.462,2.595,3.169 c0.339,0.48,0.945,0.822,1.243,1.21C41.225,12.454,42,14,42,14v-0.998c0,0,0.776,1.029,1.25,2.373C44,17.5,44,19,44,19 s-0.25-0.625-1-0.875C43,19,44,21,44,24.002v6c-0.74,0.57-0.989,1.443-1.214,2.386c-0.328,1.372-0.605,2.294-1.444,2.593L41,35.002 l-0.08,0.277c-0.533,0.662-0.994,1.351-1.439,2.018c-1.446,2.163-2.495,3.705-4.481,3.705c-1.041,0-2.044,0.167-2.441,0.559 C32.128,41.987,32,42.662,32,43.002c-1.012,0.377-2.167,1-8,1c-5,0-9.4-1.756-12.262-4.545c-0.965-0.785-2.272-1.669-2.857-2.273 C6.976,35.593,6.047,33.058,6,33.002c1.184,0.985,5.245,4.636,7.091,4.636l0,0C13.301,37.416,12,35.684,12,35.002 C13.429,37.162,17.405,40,23,40c4.125,0,3.892-0.73,6-1c4.875-0.625,7.492-5.439,8.214-6.816c0.05-0.096,0.202-1.02,0.24-1.092 c0.368-0.376,0.463-1.167,0.607-2.371C38.17,27.815,39,26.75,39,25.625S38,24,38,24s0-3-0.625-5.375 C37.25,18.151,36.738,16.409,34,13v1.002c-2.125-1.127-3.668-2.545-4.125-2.752C28.435,10.599,26.831,10,25,10c-4,0-4.625,1-8,2 c0,0,1.25,0,2,0c0,0-1.867,1.445-3,2.125c-1.875,1.125-4,5.034-4,7.875c0,3-2.485,4-4,4c-2.453,0-4-2-4-4 c0-1.133,0.45-2.5,0.886-3.425c0.411-0.873,0.799-1.697,0.795-2.581c0.031-0.106,0.274-0.383,0.435-0.566 c0.466-0.531,1.083-1.234,1.224-2.252c1.106-0.927,3.13-3.015,3.155-3.041c0.162-0.171,0.324-0.304,0.511-0.457 c0.324-0.265,0.728-0.594,1.221-1.205l0.423-0.525c0.798-0.428,2.222-1.035,2.776-1.271c0.342-0.146,0.602-0.258,0.716-0.313 L19.75,5.75C19.966,5.75,20,5.238,20,5c0-0.227,0.106-0.198,0.324-0.273C22.139,4.099,22.799,4,24.648,4L24.648,4'/%3E%3C/svg%3E" alt="Home" class="lazyload navbar__logo">
+    </a>
+    
+    <a href="/" title="Home" rel="home" class="navbar__title-link">
+      <h6 class="navbar__title">学渣的世界你不懂</h6>
+    </a>    
+  </div>
+  
+  
+<div class="theme-mobile">
+  <div class="dropdown">
+    <button class="dropdown-trigger navbar__slide-down" aria-label="Invert Colors" style="">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="none" d="M24 0H0v24h24V0z"/><path fill="currentColor" d="M6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58s4.1-.78 5.66-2.34c3.12-3.12 3.12-8.19 0-11.31l-4.95-4.95c-.39-.39-1.02-.39-1.41 0L6.34 7.93zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.69 6 15.19 6 13.59s.62-3.11 1.76-4.24L12 5.1v14.49z"/></svg>      
+    </button>
+    <div class="dropdown-content select-theme">
+      
+        
+        <a href="#" class="dropdown-item select-theme__item is-active">
+          dark
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          light
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          hacker
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          solarized
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          custom
+        </a>
+        
+      
+    </div>
+  </div>
+</div>
+
+  
+<div id="mobileSearchBtn" class="mobile-search__btn">
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M15.5 14h-.79l-.28-.27c1.2-1.4 1.82-3.31 1.48-5.34-.47-2.78-2.79-5-5.59-5.34-4.23-.52-7.79 3.04-7.27 7.27.34 2.8 2.56 5.12 5.34 5.59 2.03.34 3.94-.28 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+</div>
+
+<div id="search-mobile-container" class="mobile-search hide">
+  <div class="mobile-search__top">
+    <input id="search-mobile" type="text" aria-label="Mobile Search" placeholder="Search" class="mobile-search__top--input"/>
+    <div id="search-mobile-close" class="mobile-search__top--icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path opacity=".87" fill="none" d="M0 0h24v24H0V0z"/><path fill="currentColor" d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z"/></svg>
+    </div>
+  </div>
+  <div id="search-mobile-results" class="mobile-search__body">
+    
+  </div>
+</div>
+
+  
+  <a role="button" class="navbar__burger" aria-label="menu" aria-expanded="false">
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </a>  
+
+  <div class="navbar__menu">
+    
+<div class="theme">
+  <div class="dropdown">
+    <button class="dropdown-trigger navbar__slide-down" aria-label="Select Theme Button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="none" d="M24 0H0v24h24V0z"/><path fill="currentColor" d="M6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58s4.1-.78 5.66-2.34c3.12-3.12 3.12-8.19 0-11.31l-4.95-4.95c-.39-.39-1.02-.39-1.41 0L6.34 7.93zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.69 6 15.19 6 13.59s.62-3.11 1.76-4.24L12 5.1v14.49z"/></svg>      
+    </button>
+    <div class="dropdown-content select-theme">
+      
+        
+        <a href="#" class="dropdown-item select-theme__item is-active">
+          dark
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          light
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          hacker
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          solarized
+        </a>
+        
+        <a href="#" class="dropdown-item select-theme__item ">
+          custom
+        </a>
+        
+      
+    </div>
+  </div>
+</div>
+
+    
+    <a href="/about" class="navbar__menu-item navbar__slide-down">about</a>
+    
+    
+    <a href="/archive" class="navbar__menu-item navbar__slide-down">archive</a>
+    
+    
+    <div class="navbar__dropdown navbar__slide-down">
+      <a href="/" class="navbar__menu-item">
+        影剧库
+        <span class="navbar__menu-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M8.12 9.29L12 13.17l3.88-3.88c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0L6.7 10.7c-.39-.39-.39-1.02 0-1.41.39-.38 1.03-.39 1.42 0z"/></svg>
+        </span>
+      </a>        
+      <div class="navbar__dropdown--content">
+        
+        <a href="https://mrt.dxz.plus/index.html" class="navbar__dropdown--item">00盘</a>        
+        
+        <a href="https://share.dxz.plus/BlogContent/" class="navbar__dropdown--item">博客文件</a>        
+        
+        <a href="http://mlist.901121.xyz/" class="navbar__dropdown--item">茶先生</a>        
+        
+      </div>
+    </div>
+    
+    
+    <div class="navbar__dropdown navbar__slide-down">
+      <a href="/" class="navbar__menu-item">
+        emby测试小鸡
+        <span class="navbar__menu-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M8.12 9.29L12 13.17l3.88-3.88c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0L6.7 10.7c-.39-.39-.39-1.02 0-1.41.39-.38 1.03-.39 1.42 0z"/></svg>
+        </span>
+      </a>        
+      <div class="navbar__dropdown--content">
+        
+        <a href="http://adman.emby.ml:8096" class="navbar__dropdown--item">Adman毛子直连</a>        
+        
+        <a href="http://3.0.2.3:8096" class="navbar__dropdown--item">AWS新加坡直连</a>        
+        
+        <a href="https://je.oj8k.gq" class="navbar__dropdown--item">JusthostCDN</a>        
+        
+        <a href="http://45.89.228.234:8096" class="navbar__dropdown--item">Justhost直连</a>        
+        
+        <a href="https://emby.oj8k.gq" class="navbar__dropdown--item">甲骨文美西CDN</a>        
+        
+        <a href="http://hostsolutions.emby.ml:8096" class="navbar__dropdown--item">罗马尼亚直连</a>        
+        
+      </div>
+    </div>
+    
+    
+    <div class="navbar__dropdown navbar__slide-down">
+      <a href="/gallery" class="navbar__menu-item">
+        gallery
+        <span class="navbar__menu-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M8.12 9.29L12 13.17l3.88-3.88c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0L6.7 10.7c-.39-.39-.39-1.02 0-1.41.39-.38 1.03-.39 1.42 0z"/></svg>
+        </span>
+      </a>        
+      <div class="navbar__dropdown--content">
+        
+        <a href="/gallery/cartoon" class="navbar__dropdown--item">cartoon</a>        
+        
+        <a href="/gallery/photo" class="navbar__dropdown--item">photo</a>        
+        
+      </div>
+    </div>
+    
+    
+    <a href="/posts" class="navbar__menu-item navbar__slide-down">posts</a>
+    
+    
+    <a href="/notes" class="navbar__menu-item navbar__slide-down">notes</a>
+    
+    
+  </div>
+</nav>
+            
+            
+
+
+<script src="/js/enquire.min.72cb9edeb1ca1b92f5bf9df8d31a1ecd1e423d0b5e0f48a2a208b020dd5053fa.js"></script>
+
+<main class="main-main">
+  
+  <nav class="breadcrumb" aria-label="breadcrumbs">
+  <ol>
+    
+  
+  
+  
+  
+  
+  <li >    
+    
+      <a href="http://dxz.plus/">学渣的世界</a>            
+        
+  </li>
+  
+  
+  <li >    
+    
+      <a href="http://dxz.plus/posts/">Posts</a>
+        
+  </li>
+  
+  
+  <li  class="is-active" >    
+    
+      <a href="http://dxz.plus/posts/embyconfig/">Emby Docker 数据库操作</a>
+        
+  </li>
+  
+  </ol>
+  
+</nav>
+  
+  <div class="single">
+    <h2 class="single__title">Emby Docker 数据库操作</h2>
+    <div class="single__meta">
+      <div class="single__infos">
+  🕓 Dec 20, 2019 · ☕10 min read
+  
+</div>
+      <div class="single__tags caption">
+
+  
+    🏷️
+  
+  
+  <li>
+    <a href="/tags/docker" class="single__tag">
+      #docker
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/emby" class="single__tag">
+      #emby
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/rclone" class="single__tag">
+      #rclone
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/entertainment" class="single__tag">
+      #entertainment
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/%E5%A8%B1%E4%B9%90" class="single__tag">
+      #娱乐
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/plex" class="single__tag">
+      #plex
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/gdrive" class="single__tag">
+      #gdrive
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/%E7%BD%91%E7%9B%98" class="single__tag">
+      #网盘
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/%E8%B0%B7%E6%AD%8C" class="single__tag">
+      #谷歌
+    </a>
+  </li>
+    
+
+  
+  
+  <li>
+    <a href="/tags/server" class="single__tag">
+      #server
+    </a>
+  </li>
+    
+
+</div>
+    </div>    
+    <article class="single__contents">
+      <h1 id="介绍">介绍</h1>
+<p>Docker Emby方便之处不仅仅是容易搭建，连数据库转移也非常容易。</p>
+<p>#简单记录
+参见前面<a href="https://dxz.plus/posts/emby/">Docker Emby</a>用法的介绍，把<code>emby/config</code>和<code>/root/rclone/ldfdsa00</code>两个目录保持映射一致就可以实现vps之间emby数据库无痛转移。由于 docker 里面的结构是一样的，不需要我们操心。外面目录映射的原文件夹不管在哪儿都可以。给迁移数据带来极大的方便。等把00盘原来内容和茶先生的内容扫完，数据文件也共享出来，可以放到任何搭建好的新emby server里，按照如下操作，就可以恢复。并且自用的话，只需要删除/添加一下登陆用户就可以了</p>
+<h2 id="原数据库操作">原数据库操作</h2>
+<p>以下都是按照之前<a href="https://dxz.plus/posts/emby/">文章</a>的挂载操作，根据需要做相应改变</p>
+<pre><code>docker stop emby
+apt install zip -y
+cd /root/emby
+zip config.zip ./config -r
+</code></pre>
+<h2 id="目标数据库操作">目标数据库操作</h2>
+<p>之后把文件转移到目标VPS或者本地NAS，并拷贝到<code>/root/emby</code>目录下</p>
+<pre><code>docker stop emby
+apt install zip -y
+cd /root/emby
+unzip /root/emby/config.zip
+docker start emby
+</code></pre>
+<p>去新vps打开相关网页即可
+域名和IP都可以。域名如果按照之前教程，直接走CDN</p>
+<h1 id="效果">效果</h1>
+<p>美西小鸡emby
+<img src="https://share.dxz.plus/BlogContent/Screen%20Shot%202019-12-21%20at%209.47.28%20PM-jp.png" alt="美西">
+目标小鸡emby
+<img src="https://share.dxz.plus/BlogContent/Screen%20Shot%202019-12-21%20at%209.47.28%20PM-jp.png" alt="JP"></p>
+<h1 id="update">update</h1>
+<h2 id="利用自建900sa账号挂载jan-11-2020-at-104949-am">利用自建/900SA账号挂载<code>Jan 11, 2020 at 10:49:49 AM</code></h2>
+<p>参考<a href="https://dxz.plus/posts/autorclonetips/#%E6%89%8B%E5%8A%A8%E6%9B%BF%E6%8D%A2%E8%BD%BD%E5%85%A5rclone%E7%9A%84config%E6%96%87%E4%BB%B6%E7%AA%81%E7%A0%B4750g%E4%B8%8A%E4%BC%A0%E9%99%90%E5%88%B6">这里</a></p>
+<p>适合暂时没有搞定自己的SA Group，想马上扫00盘/茶先生盘的童鞋</p>
+<p>其实也可以一直用，100个SA，随便选一个挂上，即插即用</p>
+<h2 id="00盘用法jan-5-2020-at-90654-pm">00盘用法<code>Jan 5, 2020 at 9:06:54 PM</code></h2>
+<h3 id="jan-15-2020-at-35238-pm"><code>Jan 15, 2020 at 3:52:38 PM</code></h3>
+<h3 id="jan-16-2020-at-112811-am"><code>Jan 16, 2020 at 11:28:11 AM</code></h3>
+<p>更新了<code>/root/emby/config</code>目录<a href="https://share.dxz.plus/BlogContent/embyconfig.zip">压缩包</a>，自己替换</p>
+<h3 id="jan-28-2020-at-60226-pm"><code>Jan 28, 2020 at 6:02:26 PM</code></h3>
+<p>更新了00盘的刮削内容</p>
+<p>如果和我的目录设置一样的话，可以复制粘贴以下命令</p>
+<pre><code>cd /root/emby
+docker stop emby
+rm ./* -r
+wget https://share.dxz.plus/BlogContent/embyconfig.zip
+unzip embyconfig.zip
+docker  start emby
+</code></pre>
+<h3 id="feb-2-2020-at-123753-pm"><code>Feb 2, 2020 at 12:37:53 PM</code></h3>
+<p>更新了<a href="https://dxz.plus/posts/emby/#%E6%8C%82%E8%BD%BDrclone00%E5%9B%A2%E9%98%9F%E7%9B%98">挂载00盘</a>的操作 方便小白</p>
+<h3 id="feb-5-2020-at-102918-pm"><code>Feb 5, 2020 at 10:29:18 PM</code></h3>
+<p>vps上面搭server，配置差的，比如我用的这种。一定要关闭转码播放，不然emby擅自转码，小鸡很容易自爆
+<img src="https://share.dxz.plus/BlogContent/Screen%20Shot%202020-02-05%20at%2010.27.22%20PM-user.png" alt="user"></p>
+<p>以上为更新内容</p>
+<p>=======================================================</p>
+<p>继续教程</p>
+<p>rclone挂载，embydocker映射也和我的一样的话，下面命令</p>
+<pre><code>docker stop emby
+cd /root/emby
+rm config/ -r
+wget https://share.dxz.plus/BlogContent/embyconfig.zip
+unzip embyconfig.zip
+docker start emby
+</code></pre>
+<p>justhost小鸡对联通不错，就是硬盘太小，只能把图片/字幕/nfo存GD，扫00盘</p>
+<p>已经扫好的内容在<a href="https://share.dxz.plus/BlogContent/embyconfig.zip">此</a>。解压并替换你挂载的emby的config目录，登陆dxz，改名，加密码。</p>
+<p>00盘在embyDocker内的目录结构为<code>/00</code>只要把00盘整个映射给<code>/00</code></p>
+<p>rclone挂载参考</p>
+<pre><code> rclone mount dxz: /root/rclone/00   --allow-non-empty --allow-other   &gt;/dev/null 2&gt;&amp;1 &amp;      
+</code></pre>
+<p>docker pull命令参考：</p>
+<pre><code>docker run --name=emby -d -v /root/emby/config:/config   -v /root/rclone/00:/00    --net host  -e UID=1000  -e GID=100  -e GIDLIST=100 --restart unless-stopped  emby/embyserver:latest
+</code></pre>
+<p>这个和之前的配置基本一样，把00盘挂载到 <code>/root/rclone/00</code> 再映射给dockerEmby的<code>00</code>目录</p>
+<p>所有影剧目录设置不用改，除了字幕之外都可以不选
+<img src="https://share.dxz.plus/BlogContent/IMG_8602-Jan%205,%202020%20at%2010:04:58%20PM-Movie.JPG" alt="movie"><img src="https://share.dxz.plus/BlogContent/IMG_8601-Jan%205,%202020%20at%2010:05:12%20PM-Show.JPG" alt="show">
+如果茶先生又更新，点击扫描资料库等待完成（先等我更新完00盘再扫）</p>
+<p>整个扫完config的目录大小为106.77m，压缩包276m。5g的vps空间出去1G的缓存还剩2.1G，如果不做他用的话，再装50000部电影应该没有问题
+<img src="https://share.dxz.plus/BlogContent/Screen%20Shot%202020-01-07%20at%206.30.57%20PM-JUSTHOST.png" alt="JUSTHOST">
+由于整理影剧的工作都由茶先生牵头的小分队完成，我只是简单点几下识别，你的挂载只需要读取nfo就可以了，基本不会耗费什么流量。</p>
+<p>Just Enjoy, Really</p>
+<h2 id="高级折腾以茶先生共享盘为例">高级折腾，以茶先生共享盘为例</h2>
+<h3 id="先搞定emby-server">先搞定emby server</h3>
+<p>茶大已经把<a href="http://mio.52diudiu.com/kotobas/5386">教程</a>写好了，照做就OK。但是我的小鸡zip解压中文出问题，自己<a href="https://share.dxz.plus/BlogContent/embyConfigMrT.zip">打包</a>了一下。</p>
+<p>还是引用一下:</p>
+<blockquote>
+<p>总结一下执行步骤 ：</p>
+<ul>
+<li>
+<p>先确保关闭emby服务，<code>sudo service emby-server stop</code></p>
+</li>
+<li>
+<p>删除/metadata/，/root/，/cache/，三个文件夹，以及/data/目录下的 library.db  library.db-shm  library.db-wal 三个文件，
+(emby目录一般在 var/lib 内，如果是docker搭建的，就在你自己配置的目录内)</p>
+</li>
+<li>
+<p>下载Zip包解压文件到对压存放位置：</p>
+</li>
+</ul>
+<p>emby/data/library.db
+emby/metadata/
+emby/root/
+emby/cache/
+emby/data/collections/</p>
+<ul>
+<li>然后chown一下上面的文件， 999/998,（视你自己主机而定）</li>
+</ul>
+<p>chown 999:998 /var/lib/emby/data/library.db
+chown -R 999:998 /var/lib/emby/metadata/
+chown -R 999:998 /var/lib/emby/root/
+chown -R 999:998 /var/lib/emby/cache/
+chown -R 999:998 /var/lib/emby/data/collections/</p>
+<p>着改一下媒体库的路径
+编辑Emby/root/default/电影/options.xml 文件
+把里面的<code>&lt;Path&gt;L:\私人库\剧集\电影&lt;/Path&gt; </code>
+改成<code>&lt;Path&gt;/home/私人库/剧集/电影&lt;/Path&gt; </code></p>
+<p><img src="https://share.dxz.plus/BlogContent/MrTembyConfig.png" alt="MrTembyConfig"></p>
+<ul>
+<li>再Rclone挂载到指定目录：/home/私人库/</li>
+</ul>
+<p>rclone mount gdrive: /home/私人库 &ndash;巴拉巴拉巴拉</p>
+<ul>
+<li>最后重启emby服务：<code>sudo service emby-server start</code> 即可</li>
+</ul>
+</blockquote>
+<p>不过其实上面是过程，知道怎么回事就行了。直接把我<a href="https://share.dxz.plus/BlogContent/embyConfigMrT.zip">打包的文件</a>夹替换emby的config文件夹
+然后执行</p>
+<pre><code>chown 1000:users /var/lib/emby/data/library.db
+chown -R 1000:users /var/lib/emby/metadata/
+chown -R 1000:users /var/lib/emby/root/
+chown -R 1000:users /var/lib/emby/cache/
+chown -R 1000:users /var/lib/emby/data/collections/
+</code></pre>
+<p>上面的 1000:users 改成你自己的</p>
+<p>到原来config 目录 随便选一个文件</p>
+<pre><code>ls -ld filename
+</code></pre>
+<p>就可以查到对应owner</p>
+<h3 id="再设置一下rclone挂载">再设置一下rclone挂载</h3>
+<p>其实用docker的话，rclone挂载在哪儿都无所谓，只要emby docker 拉取镜像的时候添加一个文件夹映射就可以了</p>
+<pre><code>docker run --name=emby -d -v /root/emby/config:/config   -v /root/rclone:/clone  -v /root/rclone/MrT:/home/私人库   --net host  -e UID=1000  -e GID=100  -e GIDLIST=100 --restart unless-stopped  emby/embyserver:latest
+</code></pre>
+<p>上面是把茶大的盘挂载到了<code>/root/rclone/MrT</code> 映射到docker里面为<code>/home/私人库</code></p>
+<p>搞定以后 <code>docker start emby</code>启动embyserver，自己把dxz用户删掉 改成自己用户 加上密码就算齐活儿</p>
+<h3 id="演示">演示</h3>
+<p>刚刚弄好的，用kodi 的emby插件，可以顺畅1080P。</p>
+<video width="640" height="auto" controls>
+<source src="https://share.dxz.plus/BlogContent/IMG_0441-EmbyTestOracleUSWest.MP4">
+</video>
+茶大的盘好就好在没有4k，小鸡和带宽压力瞬间变小。不过还是期待高峰表现。
+<h2 id="实时vps-embyserver-同步">实时vps embyserver 同步</h2>
+<p>群友<code>@terrancesiu</code>大佬介绍新方法，可以实时同步更新</p>
+<p>大意(我理解，还没试)就是利用dropbox提供的增量同步，实现两个VPS之间数据实时更新，这样就可以完全自动化，连转移目录都省了</p>
+<p><del>留个小坑，等试验成功的</del></p>
+<h2 id="rsync-同步embyserver资料库"><del>rsync 同步embyserver资料库</del></h2>
+<h3 id="docker版本"><del>docker版本</del></h3>
+<p>安装rsync</p>
+<pre><code>apt install rsync
+</code></pre>
+<p>在docker的embyserver搞定以后，先停止server</p>
+<pre><code>docker stop emby
+</code></pre>
+<p>然后进入任意位置建立同步排除文件(夹)列表，我这里放在<code>/root/emby</code>文件夹下</p>
+<pre><code>nano /root/emby/exclude.txt
+</code></pre>
+<p>然后填入如下内容，根据你的情况作相应更改，如果和我配置一样，就不用改</p>
+<pre><code>data/authentication.db-*
+/logs
+/home/dxz/emby/config/logs
+/home/dxz/emby/config/config
+/home/dxz/emby/config/root
+/home/dxz/emby/config/plugins
+/home/dxz/emby/config/transcoding-temp
+data/users.db*
+data/library.db-*
+data/devices
+data/activitylog.db-*
+data/ScheduledTasks
+cache
+</code></pre>
+<p>然后进行rsync同步</p>
+<pre><code>rsync -uavzP dxz@129.146.46.134:/home/dxz/emby/config/ /root/emby/config/  --exclude-from '/root/emby/exclude.txt'
+</code></pre>
+<p>中间会提示输入密码:<code>dxz</code>
+<code>/root/emby/config/</code>目录是docker的<code>emby/config</code>目录，<code>'/root/emby/exclude.txt'</code>是排除文列表，根据需要更改，其他不用动</p>
+<p>第一次几乎要把5G多的东西从我的小鸡下载到你的小鸡（或者是做对比，具体我也不知道），由于我上传只有40m，所以要很久。之后就会快，2分钟以内可以搞定</p>
+<p>之后删掉一个文件</p>
+<pre><code>rm /root/emby/config/library.db-wal
+</code></pre>
+<p>再重启emby</p>
+<pre><code>docker restart emby
+</code></pre>
+<p>这个方法有个缺点，无法保留一些自定义设置和播放记录。如果茶先生有更新的话，他会把更新内容整理好放出来。当然，你的<code>embyserver</code>如果和茶先生设置一致的话，她会自行发现并刮削新增内容，虽然速度慢，但是全自动，按照相应规则应该可以刮削出来。茶先生有大的更新，那就只能在我的小鸡更新以后再同步一遍</p>
+<p>其实可以再embydocker搭建完成就直接rsync演示🐔的配置文件，但是由于我设置了管理员密码，所以到了本地只有dxz这个演示用户可用。所以才有上述添加排除列表的需求</p>
+<p>另外也可以用<a href="https://hub.docker.com/r/janeczku/dropbox/">docker版的dropbox</a>来做增量同步，但是那样的话需要用dropbox账户，并且每次授权都要dropbox所有者确认，比较麻烦，所以暂时先不做实验了，如果dropbox效果优于rsync的话，会更新。毕竟rsync也是增量同步，第二次以后的同步会很快</p>
+<h3 id="直装版本">直装版本</h3>
+<h4 id="forwarded-from-茶先生">Forwarded from 茶先生</h4>
+<blockquote>
+<p>安装运行Verysync，（感谢emeng推荐）</p>
+<p><code>VerySync 密匙   ：B3APU22XOPA3TOYUKHWHL47MFGN4SXVX24H7VIFC36TLCL3CAK7KFU4</code></p>
+<p>添加这个密匙后会开始同步我的emby整个文件夹，P2P速度很快</p>
+<p>Windows到这就结束了，同步完后就直接用就行了</p>
+<p>用Raidrive把私人库挂载到L盘即可（必须L盘）</p>
+<p>这样一来，只要保持verysync后台运行，就能一直同步更新</p>
+<p>哦 对了 emby默认账号密码</p>
+<p><code>OldGoodGuy diudiu</code></p>
+</blockquote>
+<h4 id="forwarded-from-茶先生-1">Forwarded from 茶先生</h4>
+<blockquote>
+<p>Linux第一次使用需要一些操作</p>
+<p>我们先设置Verysync同步文件到<code>/home/emby/</code>文件夹下</p>
+<p>同步完之后，进入Emby后台设置</p>
+<p>设置-缓存路径-<code>/home/Emby/programdata/</code></p>
+<p>媒体库 -高级-设置资料文件夹：<code>/home/Emby/programdata/</code></p>
+<p><code>programdata</code>文件夹给写入权限，保存后关闭Emby</p>
+<p>sudo service emby-server stop
+替换以下文件夹</p>
+<p>cp -r -f /home/Emby/programdata/Linux/root /var/lib/emby
+cp -r -f /home/Emby/programdata/data/collections /var/lib/emby/data
+删除替换数据库文件，并修改用户组为<code>emby:emby</code>不改无法启动）</p>
+<p>rm /var/lib/emby/data/library.db-shm
+rm /var/lib/emby/data/library.db-wal
+cp  -r -f /home/Emby/programdata/Linux/library.db /var/lib/emby/data
+chown -R emby:emby /var/lib/emby/data/library.db
+(注意<code>emby:emby</code>需要改成你自己的emby所属用户组，看同文件夹内其他文件是什么用户组，就改那个）
+重启Emby即可</p>
+<p>之后rclone务必挂载团队盘到 <code>/home/私人库/</code>内，
+不然数据库无法关联到媒体文件，无法播放
+例如：</p>
+<p>rclone mount gdrive: /home/私人库 &ndash;巴拉巴拉巴拉
+如果需要挂载到别的路径，自己修改数据库</p>
+<p>重启Emby，大功告成</p>
+<p>以后每次更新，因为所有资料夹文件都会自动同步，因此只需要替换数据库即可
+一次性运行以下命令</p>
+<p>sudo service emby-server stop
+rm /var/lib/emby/data/library.db-shm
+rm /var/lib/emby/data/library.db-wal
+cp  -r -f /home/Emby/programdata/Linux/library.db /var/lib/emby/data
+chown -R emby:emby /var/lib/emby/data/library.db
+sudo service emby-server start
+####Update:Jan 24, 2020 at 12:14:33 PM
+Q:用very sync同步完Emby后，结果打开本地的emby网页提示拒绝访问
+A:这是因为网页同步到了以下这些数据库的临时文件造成的</p>
+<p>\Emby\programdata\data\activitylog.db-shm
+\Emby\programdata\data\activitylog.db-wal
+\Emby\programdata\data\authentication.db-shm
+\Emby\programdata\data\authentication.db-wal
+\Emby\programdata\data\displaypreferences.db-shm
+\Emby\programdata\data\library.db-shm
+\Emby\programdata\data\library.db-wal
+\Emby\programdata\data\users.db-shm
+\Emby\programdata\data\users.db-wal
+删除这些文件后再运行就行了。
+那么如何防止这个现象再次发生呢？</p>
+<p>只需添加过滤规则即可
+打开VerySync网页，右键你的Emby文件夹-忽略文件列表</p>
+<p>输入
+emby 过滤列表 防止出现访问拒绝问题
+(?d)<em>.db-</em>
+如果想保留自己建立的用户和观看进度，则继续添加以下代码后保存即可
+#保留自己建立的用户和观看进度
+(?d)users.db*
+(?d)authentication.db*
+(?d)activitylog.db*
+(?d)displaypreferences.db*
+这样，以后就不会出现拒绝访问的问题了。
+<img src="https://share.dxz.plus/BlogContent/Screen%20Shot%202020-01-24%20at%2011.54.58%20AM-MrTDebug.jpg" ></p>
+</blockquote>
+<h3 id="verysync-docker操作">verysync docker操作</h3>
+<p>这里吧verysync的目录设为<code>/home/dxz/MrT</code>（根据需要自己更改）EmbyserverDocker目录设为<code>/home/dxz/emby/config</code></p>
+<p>verysync同步完之后，进入Emby后台设置</p>
+<p>设置-缓存路径-<code>/home/dxz/MrT/programdata/</code></p>
+<p>媒体库 -高级-设置资料文件夹：<code>/home/dxz/MrT/programdata/</code></p>
+<p><code>programdata</code>文件夹给写入权限，保存后关闭Emby</p>
+<pre><code>docker emby stop
+</code></pre>
+<p>替换以下文件/夹</p>
+<pre><code>rm /var/lib/emby/data/library*
+cp -r -f /home/dxz/MrT/programdata/data/collections /home/dxz/emby/config/data/collections
+cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata
+cp -f /home/dxz/MrT/programdata/Linux/library.db /home/dxz/emby/config/data/
+chown -R 1000:users /home/dxz/emby/config/data/library.db
+</code></pre>
+<p>(注意<code>1000:users</code>需要改成你自己的emby所属用户组，看同文件夹内其他文件是什么用户组，就改那个）</p>
+<p>之后rclone务必挂载团队盘到<code>/home/私人库/</code>内，不然数据库无法关联到媒体文件，无法播放,由于是docker，改下pull命令就可以了</p>
+<pre><code>docker stop emby
+docker rm emby
+docker run --name=emby -d -v /home/dxz/emby/config:/config   -v /root/rclone:/clone  -v /root/rclone/MrT:/home/私人库   --net host  -e UID=1000  -e GID=100  -e GIDLIST=100 --restart unless-stopped  emby/embyserver:latest
+</code></pre>
+<p>以后每次更新，因为所有资料夹文件都会自动同步，因此只需替换数据库文件，一次性运行以下命令</p>
+<pre><code>docker stop emby
+rm /home/dxz/emby/config/data/librar*
+cp -r -f /home/dxz/MrT/programdata/cache /home/dxz/emby/config/cache
+cp -r -f /home/dxz/MrT/programdata/data/collections /home/dxz/emby/config/data/collections
+cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata
+cp -r -f /home/dxz/MrT/programdata/Linux/library.db /home/dxz/emby/config/data/
+chown 1000:users /home/dxz/emby/config/data/library.db
+docker start emby
+</code></pre>
+<p>之所以重复拷贝<code>cp -r -f /home/dxz/MrT/programdata/metadata /home/dxz/emby/config/metadata</code>是因为verysync付费版本才可以选择目录，这一点不如rsync实在，不过已经很方便了。稍微浪费一点点磁盘空间。</p>
+<p>目前正在扫00盘里的茶先生电影备份，nfo和图片字幕都存到gdrive了。所以可以像之前00盘的用法一样，直接扫。优点是几乎不占用vps空间，缺点嘛，打开emby载入图片稍微慢一点（速度取决于vps的google的速度）</p>
+<p>另外茶先生正在做00盘并入私人盘的工作，等完成以后，直接扫00盘里面的茶先生文件夹即可，movie和show都可以删掉了</p>
+<p>大体是这样了，我在演示服务器已经成功，欢迎围观 emby.giagia.ga</p>
+<p>再次感谢茶先生的无私精神</p>
+<h1 id="排错">排错</h1>
+<h2 id="emby无法读取挂载目录">emby无法读取挂载目录</h2>
+<p>如果是在docker环境下，检查创建/拉取容器的命令里面是否有给容器root权限参数</p>
+<pre><code>-e UID=1000  -e GID=100  -e GIDLIST=100 
+</code></pre>
+<p>rclone挂载命令是否有</p>
+<pre><code>--allow-non-empty --allow-other
+</code></pre>
+    </article>
+    
+    
+<div class="whoami__gutter"></div>
+<hr class="hr-slash whoami-hr"/>
+<section class="whoami">  
+  <div class="whoami__image-wrapper">
+    
+    
+      
+        <img data-src="/images/whoami/avatar.jpg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24pt' height='24pt' viewBox='0 0 24 24' version='1.1'%3E%3Cg id='surface1035795'%3E%3Cpath style=' stroke:none;fill-rule:nonzero;fill:rgb(80%25,80%25,80%25);fill-opacity:1;' d='M 4 4 C 2.90625 4 2 4.90625 2 6 L 2 18 C 2 19.09375 2.90625 20 4 20 L 20 20 C 21.09375 20 22 19.09375 22 18 L 22 6 C 22 4.90625 21.09375 4 20 4 Z M 4 6 L 20 6 L 20 18 L 4 18 Z M 4 6 '/%3E%3C/g%3E%3C/svg%3E%0A" alt="金牌大学渣" class="lazyload whoami__image"/>
+             
+    
+  </div>
+  <div class="whoami__contents">
+    <div class="whoami__written-by">
+      WRITTEN BY
+    </div>
+    <div class="whoami__title">
+      金牌大学渣
+    </div>
+    <div class="whoami__desc">
+      Web Developer      
+    </div>
+    <div class="whoami__social">
+      
+      
+      
+      
+      
+      
+      
+      
+      <a href="https://groups.google.com/forum/#!forum/00share" title="google-plus" aria-label="google-plus">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="25" height="25"><path fill="currentColor" d="M 11 7 C 6.027344 7 2 11.027344 2 16 C 2 20.972656 6.027344 25 11 25 C 15.972656 25 20 20.972656 20 16 C 20 15.382813 19.933594 14.78125 19.8125 14.199219 L 19.765625 14 L 11 14 L 11 17 L 17 17 C 16.523438 19.835938 13.972656 22 11 22 C 7.6875 22 5 19.3125 5 16 C 5 12.6875 7.6875 10 11 10 C 12.5 10 13.867188 10.554688 14.921875 11.464844 L 17.070313 9.359375 C 15.46875 7.894531 13.339844 7 11 7 Z M 25 11 L 25 14 L 22 14 L 22 16 L 25 16 L 25 19 L 27 19 L 27 16 L 30 16 L 30 14 L 27 14 L 27 11 Z"/></svg>
+      </a>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <a href="https://t.me/dxb22abad" title="telegram" aria-label="telegram">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="25" height="25"><path fill="currentColor" d="M 26.070313 3.996094 C 25.734375 4.011719 25.417969 4.109375 25.136719 4.21875 L 25.132813 4.21875 C 24.847656 4.332031 23.492188 4.902344 21.433594 5.765625 C 19.375 6.632813 16.703125 7.757813 14.050781 8.875 C 8.753906 11.105469 3.546875 13.300781 3.546875 13.300781 L 3.609375 13.277344 C 3.609375 13.277344 3.25 13.394531 2.875 13.652344 C 2.683594 13.777344 2.472656 13.949219 2.289063 14.21875 C 2.105469 14.488281 1.957031 14.902344 2.011719 15.328125 C 2.101563 16.050781 2.570313 16.484375 2.90625 16.722656 C 3.246094 16.964844 3.570313 17.078125 3.570313 17.078125 L 3.578125 17.078125 L 8.460938 18.722656 C 8.679688 19.425781 9.949219 23.597656 10.253906 24.558594 C 10.433594 25.132813 10.609375 25.492188 10.828125 25.765625 C 10.933594 25.90625 11.058594 26.023438 11.207031 26.117188 C 11.265625 26.152344 11.328125 26.179688 11.390625 26.203125 C 11.410156 26.214844 11.429688 26.21875 11.453125 26.222656 L 11.402344 26.210938 C 11.417969 26.214844 11.429688 26.226563 11.441406 26.230469 C 11.480469 26.242188 11.507813 26.246094 11.558594 26.253906 C 12.332031 26.488281 12.953125 26.007813 12.953125 26.007813 L 12.988281 25.980469 L 15.871094 23.355469 L 20.703125 27.0625 L 20.8125 27.109375 C 21.820313 27.550781 22.839844 27.304688 23.378906 26.871094 C 23.921875 26.433594 24.132813 25.875 24.132813 25.875 L 24.167969 25.785156 L 27.902344 6.65625 C 28.007813 6.183594 28.035156 5.742188 27.917969 5.3125 C 27.800781 4.882813 27.5 4.480469 27.136719 4.265625 C 26.769531 4.046875 26.40625 3.980469 26.070313 3.996094 Z M 25.96875 6.046875 C 25.964844 6.109375 25.976563 6.101563 25.949219 6.222656 L 25.949219 6.234375 L 22.25 25.164063 C 22.234375 25.191406 22.207031 25.25 22.132813 25.308594 C 22.054688 25.371094 21.992188 25.410156 21.667969 25.28125 L 15.757813 20.75 L 12.1875 24.003906 L 12.9375 19.214844 C 12.9375 19.214844 22.195313 10.585938 22.59375 10.214844 C 22.992188 9.84375 22.859375 9.765625 22.859375 9.765625 C 22.886719 9.3125 22.257813 9.632813 22.257813 9.632813 L 10.082031 17.175781 L 10.078125 17.15625 L 4.242188 15.191406 L 4.242188 15.1875 C 4.238281 15.1875 4.230469 15.183594 4.226563 15.183594 C 4.230469 15.183594 4.257813 15.171875 4.257813 15.171875 L 4.289063 15.15625 L 4.320313 15.144531 C 4.320313 15.144531 9.53125 12.949219 14.828125 10.71875 C 17.480469 9.601563 20.152344 8.476563 22.207031 7.609375 C 24.261719 6.746094 25.78125 6.113281 25.867188 6.078125 C 25.949219 6.046875 25.910156 6.046875 25.96875 6.046875 Z"/></svg>
+      </a>
+      
+      
+      
+      
+      
+      
+      
+      
+    </div>
+  </div>
+</section>
+<hr class="hr-slash whoami-hr" />
+
+    <section class="related">
+    
+    
+    <h1 class="related__title">
+      <hr class="hr-dots"/>
+      <div>
+        See Also
+      </div>
+      <hr class="hr-dots"/>
+    </h1>
+    <ul class="related-ul">
+        
+        <li>
+          <a href="/posts/emby/" class="related__link">VPS 5分钟极速搭建emby服务</a>
+        </li>
+        
+        <li>
+          <a href="/posts/autorclonetips/" class="related__link">Autorclone 教程的一些tips及折腾中遇到的错误的解决办法</a>
+        </li>
+        
+        <li>
+          <a href="/posts/autorclonesagroup/" class="related__link">AutoRclone 手动加 SA 到 Group 5分钟 5minuts</a>
+        </li>
+        
+        <li>
+          <a href="/posts/autorclonesa5minutes/" class="related__link">AutoRclone 教程 Tutorial 利用Group添加SA，5分钟搞定 gdrive转存 Adding Service Accounts (SA) to a Googlegroup</a>
+        </li>
+        
+        <li>
+          <a href="/posts/gdrive15g/" class="related__link">5分钟-15G普通Gdrive账号变身无限制用不翻车账号</a>
+        </li>
+        
+    </ul>
+    
+  </section>
+    <div class="grow"></div>
+<nav class="pagination-single">
+  
+    <a href="http://dxz.plus/posts/travisgo/" class="pagination-single__left">
+      <div class="pagination-single__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="currentColor" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>
+      </div>
+      <div class="pagination-single__left-title">解决 hugo travis 部署博客 failed and exited with 2 during . 错误</div>      
+    </a>
+  
+  <div class="grow"></div>
+  
+    <a href="http://dxz.plus/posts/snap2html/" class="pagination-single__right">      
+      <div class="pagination-single__right-title">snap2html linux 定时推送 github</div>
+      <div class="pagination-single__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="currentColor" d="M5 13h11.17l-4.88 4.88c-.39.39-.39 1.03 0 1.42.39.39 1.02.39 1.41 0l6.59-6.59c.39-.39.39-1.02 0-1.41l-6.58-6.6c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L16.17 11H5c-.55 0-1 .45-1 1s.45 1 1 1z"/></svg>
+      </div>
+    </a>
+  
+</nav>
+    
+  
+    <span id="/posts/embyconfig/" class="leancloud_visitors" data-flag-title="Emby Docker 数据库操作">
+  <span class="post-meta-item-text">Viewed</span>
+  <span class="leancloud-visitors-count"></span>
+  <p></p>
+  </span>
+<div id="vcomments"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script>
+  new Valine({
+      el: '#vcomments' ,
+      appId: 'ERPCAPWFshjodtg7rS21cIGO-MdYXbMMI',
+      appKey: '2WM07eER0CSsxsFLNXMDyWcc',
+      notify:  false ,
+      verify:  false ,
+      avatar:'robohash',
+      placeholder: '留言未必有人看，不留言自己都看不到。。。',
+      visitor:  true 
+  });
+</script>
+  
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+  
+  <div class="pswp__bg"></div>
+
+  
+  <div class="pswp__scroll-wrap">
+
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+
+    
+    <div class="pswp__ui pswp__ui--hidden">
+
+      <div class="pswp__top-bar">
+
+        
+
+        <div class="pswp__counter"></div>
+
+        <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+        <button class="pswp__button pswp__button--share" title="Share"></button>
+
+        <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+        <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+        
+        
+        <div class="pswp__preloader">
+          <div class="pswp__preloader__icn">
+            <div class="pswp__preloader__cut">
+              <div class="pswp__preloader__donut"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+        <div class="pswp__share-tooltip"></div>
+      </div>
+
+      <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+      </button>
+
+      <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+      </button>
+
+      <div class="pswp__caption">
+        <div class="pswp__caption__center"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+    <div class="hide">
+    
+
+<div class="search">
+  <span class="icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M15.5 14h-.79l-.28-.27c1.2-1.4 1.82-3.31 1.48-5.34-.47-2.78-2.79-5-5.59-5.34-4.23-.52-7.79 3.04-7.27 7.27.34 2.8 2.56 5.12 5.34 5.59 2.03.34 3.94-.28 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+  </span>
+  <input id="search" aria-label="Site Search" class="input" type="text" placeholder="Search" autocomplete="off">
+  <div id="search-results" class="dropdown">
+    <div id="search-menu" class="dropdown-menu" role="menu">
+    </div>
+  </div>
+</div>
+
+
+<script defer src="/js/lunr.min.74ef9f2fd39b71f2410c165b75402f2e112977745d76b87120e4571e73008e76.js"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/lunr-languages@1.4.0/min/lunr.stemmer.support.min.js" integrity="sha256-LnITYFhGoYAU7HUJEMsYqKTGC7IyABA7P62e8nsQxwU=" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/lunr-languages@1.4.0/min/lunr.multi.min.js" integrity="sha256-l2H0da5582Qg/3FN&#43;ZUO&#43;yZO/8&#43;SMO/VW1EaDeiZ6Xk=" crossorigin="anonymous"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+    </div>
+  </div>
+</main>
+
+
+<aside class="main-side">
+  
+
+
+<section class="sidebar">
+  <div class="toc__flexbox">
+    <h6 class="toc__title">What&#39;s on this Page</h6>
+    
+      <label class="switch">
+        <input id="toggle-toc" aria-label="Toggle TOC" type="checkbox" checked>
+        <span class="slider round"></span>
+      </label>
+    
+  </div>
+  <div class="toc">
+    <ul id="toc"></ul>
+  </div>
+</section>
+
+
+
+</aside>
+
+<script>
+  enquire.register("screen and (max-width: 769px)", {
+    match: function () {
+      if (document.getElementsByTagName('main')[0]) {
+        document.getElementsByTagName('main')[0].className = "main";
+      }
+      if (document.getElementsByTagName('aside')[0]) {
+        document.getElementsByTagName('aside')[0].className = "hide";
+      }
+    },
+    unmatch: function () {
+      if (document.getElementsByTagName('main')[0]) {
+        document.getElementsByTagName('main')[0].className = "main-main";
+      }
+      if (document.getElementsByTagName('aside')[0]) {
+        document.getElementsByTagName('aside')[0].className = "main-side";
+      }
+      document.getElementsByClassName('navbar__burger')[0].classList.remove('is-active');
+      document.getElementsByClassName('navbar__menu')[0].classList.remove('is-active');
+      document.getElementsByClassName('mobile-search')[0].classList.add('hide');
+    },
+    setup: function () { },
+    deferSetup: true,
+    destroy: function () { },
+  });
+</script>
+
+
+
+
+<script defer src="/js/jquery.min.0925e8ad7bd971391a8b1e98be8e87a6971919eb5b60c196485941c3c1df089a.js"></script>
+
+<script defer src="/js/enquire.min.72cb9edeb1ca1b92f5bf9df8d31a1ecd1e423d0b5e0f48a2a208b020dd5053fa.js"></script>
+
+<script defer src="/js/clipboard.min.1626706afc88d95ebe1173b553ec732c6dc82a576989315fdf5e7779af738a44.js"></script>
+
+<script defer src="/js/lazysizes.min.31dd6a2d3a1ec0f78a8df007535cf23f03aeb5c70f026e6d6a19dac3b3acc340.js"></script>
+
+<script defer src="/js/zzo.min.4682dde9528ba443dab1e1dc90571c61e31099ad9136de585a722cb77aee3295.js"></script>
+
+
+  
+  <script defer src="/lib/photoswipe/photoswipe.min.78fc260a16dbbd76ec3b4da56ccdc7a076d21d31c501e0a17a4175c4a25d95ea.js"></script>
+  
+  <script defer src="/lib/photoswipe/photoswipe-ui-default.min.50a9333a7ff0d660714662cb1ab49ec81e1ed716eba78c729600166f7338da95.js"></script>
+  
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css">
+  
+  <link rel="stylesheet" href="/lib/photoswipe/custom-skin.min.css">
+
+
+
+  
+  <script defer src="/js/jquery.toc.min.376e1b5d343786c1978dbad9ea7a0e23088947732993a91dcbad995883c96ceb.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  window.onload = function() {
+    
+    (function () {
+      document.querySelectorAll('.chroma > table')
+        .forEach((element) => {
+          const sub = element.querySelector('code[data-lang]');
+          if (sub) {
+            $(element).closest('div.chroma').attr('data-lang', mapLang(sub.getAttribute('data-lang')));
+          }
+        }
+      );
+    })();
+
+    (function () {
+      document.querySelectorAll('.single__contents > pre > code')
+        .forEach((element) => {
+          if (!$(element).attr('data-lang')) {
+            $(element).parent().wrap('<div data-lang="Code" class="language-code"></div>');
+          }
+        });
+    })();
+
+    function mapLang(name) {
+      return {
+        coffeescript: 'CoffeeScript',
+        cpp: 'C++',
+        cs: 'C#',
+        css: 'CSS',
+        html: 'HTML',
+        http: 'HTTP',
+        js: 'JavaScript',
+        json: 'JSON',
+        objectivec: 'Objective-C',
+        php: 'PHP',
+        sql: 'SQL',
+        toml: 'TOML',
+        ts: 'TypeScript',
+        typescript: 'TypeScript',
+        xml: 'XML',
+        yaml: 'YAML',
+      }[name] || name.toUpperCase();
+    }
+
+    
+    runSearch();
+
+    
+    
+    
+    var enableBusuanzi = JSON.parse("false");
+    var busuanziPagePV = JSON.parse("true");
+    
+    if (enableBusuanzi && busuanziPagePV) {      
+      $('#busuanzi_value_page_pv').digits();
+    }    
+
+    var navbar = $('.navbar');
+
+    
+    
+    var enableToc = JSON.parse("true");
+    
+    if (enableToc) {
+      $("#toc").toc({ content: ".single__contents", headings: "h1,h2,h3,h4" });
+      $('#toc > li').each(function () {
+        $(this).find('ul').css('display', 'none');
+      });
+      $('#toc a').each(function () {
+        $(this).click(function () {
+          navbar.removeClass('navbar--show');
+          navbar.removeClass('navbar--hide');
+          navbar.addClass('navbar--hide');
+
+          $(".single__contents :header").each(function () {
+            $('.toc a').removeClass('active');
+          });
+          $(this).addClass('active');
+
+          $('#toc > li').each(function () {
+            $(this).find('ul').css('display', 'none');
+          });
+          $(this).next().css('display', 'block');
+          $(this).parents('ul').css('display', 'block');
+        });
+      });
+
+      
+      $("#toggle-toc").change(function () {
+        if (this.checked) {
+          $('.toc').fadeIn(200);
+        } else {
+          $('.toc').fadeOut(200);
+        }
+      });
+    }    
+
+    
+    var text, clip = new ClipboardJS('.anchor');
+    var headers = $('.single__contents :header').not('h6').not('h5');
+    headers.append(function (index, html) {
+      var element = $(this);
+      var url = encodeURI(document.location.origin + document.location.pathname);
+      var link = url + "#" + element[0].id;
+      return " <span class='anchor hide' data-clipboard-text='" + link + "' style='position: relative;'>" +
+        "<span style='font-size: 1rem; position: absolute; right: -2rem; top: 50%; transform: translateY(-50%)'>🔗</span>" +
+        "</span>"
+        ;
+    });
+    headers.on('mouseenter', function () {
+      $(this).find('.anchor').attr('class', 'anchor');
+    });
+    headers.on('mouseleave', function () {
+      $(this).find('.anchor').attr('class', 'anchor hide');
+    });
+
+    $(".anchor").on('mouseleave', function (e) {
+      $(this).attr('aria-label', null).removeClass('tooltipped tooltipped-s tooltipped-w');
+    });
+
+    clip.on('success', function (e) {
+      e.clearSelection();
+      $(e.trigger).attr('aria-label', 'Link copied to clipboard!').addClass('tooltipped tooltipped-s');
+    });
+    
+    $('.language-code').each(function (i, node) {
+      $(node).append('<span class="copy-to-clipboard" title="Copy to clipboard"/>');
+    });
+
+    
+    var clipInit = false;
+    $('pre.chroma code, .language-code code').each(function () {
+      var code = $(this),
+        text = code.text();
+
+      if (text.length > 30) {
+        if (!clipInit) {
+          var text, clip = new ClipboardJS('.copy-to-clipboard', {
+            text: function (trigger) {
+              console.log();
+              if ($(trigger).prev().find('code').length > 1) {                
+                text = $(trigger).prev().find(`code[class^="language-"]`).text();
+              } else {
+                text = $(trigger).prev().find('code').text();
+              }
+               
+              return text.replace(/^\$\s/gm, '');
+            }
+          });
+
+          var inPre;
+          clip.on('success', function (e) {
+            e.clearSelection();
+            inPre = $(e.trigger).parent().prop('tagName') == 'PRE';
+            $(e.trigger).attr('aria-label', 'Copied to clipboard!').addClass('tooltipped tooltipped-w');
+          });
+
+          clip.on('error', function (e) {
+            inPre = $(e.trigger).parent().prop('tagName') == 'PRE';
+            $(e.trigger).attr('aria-label', fallbackMessage(e.action)).addClass('tooltipped tooltipped-w');
+            $(document).one('copy', function () {
+              $(e.trigger).attr('aria-label', 'Copied to clipboard!').addClass('tooltipped tooltipped-w');
+            });
+          });
+
+          clipInit = true;
+        }
+
+        var notAllowedClass = ['language-mermaid', 'language-viz', 'language-wave', 'language-chart', 'language-msc', 'language-flowchart'];
+        var isNotAllowedIncluded = false;
+        var curClassName = code.attr('class');
+
+        for (let str of notAllowedClass) {
+          if (curClassName && curClassName.startsWith(str)) {
+            isNotAllowedIncluded = true;
+            break;
+          } 
+        }
+        
+        if (!isNotAllowedIncluded) {
+          if (curClassName) {
+            code.closest('div.chroma').append('<span class="copy-to-clipboard" title="Copy to clipboard" />');
+          }         
+        }        
+      }
+    });
+
+    
+    
+    var enablePhotoSwipe = JSON.parse("true");
+    
+    if (enablePhotoSwipe) {
+      var pswpElement = $('.pswp')[0];
+      var imgElements = $('.single__contents').find('img');
+      var items = [];
+
+      imgElements.each(function (i, v) {
+        $(this).click(function (e) {
+          initGallery(i);
+        });
+        $(this).css('cursor', 'pointer');
+        items.push({
+          src: v['src'],
+          w: 0,
+          h: 0,
+          title: filename(v['src']),
+        });
+      });
+
+      function filename(str) {
+        var s = str.replace(/\\/g, '/');
+        s = s.substring(s.lastIndexOf('/') + 1);
+        return str ? s.replace(/[?#].+$/, '') : s.split('.')[0];
+      }
+
+      function initGallery(index) {
+        var options = { index: index };
+        var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+        gallery.listen('imageLoadComplete', function (index, item) {
+          if (item.h < 1 || item.w < 1) {
+            let img = new Image();
+            img.onload = () => {
+              item.w = img.width;
+              item.h = img.height;
+              gallery.invalidateCurrItems();
+              gallery.updateSize(true);
+            }
+            img.src = item.src;
+          }
+        });
+        gallery.init();
+      }
+    }
+
+    
+    
+    var lib = JSON.parse("null");
+
+    if (lib && lib.includes('mermaid')) {
+      
+      var themeVariant = localStorage.getItem('theme') || JSON.parse("\"dark\"");
+
+      if (themeVariant === "dark" || themeVariant === "hacker") {
+        mermaid.initialize({ theme: 'dark' });
+      } else {
+        mermaid.initialize({ theme: 'default' });
+      }
+      
+      let mermaids = [];
+      [].push.apply(mermaids, document.getElementsByClassName('language-mermaid'));
+      for (i = 0; i < mermaids.length; i++) {
+        $(mermaids[i]).unwrap('pre');
+        $(mermaids[i]).replaceWith(function () {
+          return $("<div />").append($(this).contents()).addClass('mermaid').css('padding', '34px 4px 6px');
+        });
+      }
+
+      
+
+    }
+
+    
+    if (lib && lib.includes('katex')) {
+      var mathElements = document.getElementsByClassName('math');
+      var options = [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ];
+
+      renderMathInElement(document.querySelector('.single__contents'), options);
+    }
+
+    
+    if (lib && lib.includes('flowchartjs')) {
+      
+      var options = JSON.parse("{\"arrow-end\":\"block\",\"element-color\":\"black\",\"fill\":\"white\",\"flowstate\":{\"approved\":{\"fill\":\"#58C4A3\",\"font-size\":12,\"no-text\":\"n/a\",\"yes-text\":\"APPROVED\"},\"current\":{\"fill\":\"yellow\",\"font-color\":\"red\",\"font-weight\":\"bold\"},\"future\":{\"fill\":\"#FFFF99\"},\"invalid\":{\"fill\":\"#444444\"},\"past\":{\"fill\":\"#CCCCCC\",\"font-size\":12},\"rejected\":{\"fill\":\"#C45879\",\"font-size\":12,\"no-text\":\"REJECTED\",\"yes-text\":\"n/a\"},\"request\":{\"fill\":\"blue\"}},\"font-color\":\"black\",\"font-size\":14,\"line-color\":\"black\",\"line-length\":50,\"line-width\":3,\"no-text\":\"no\",\"scale\":1,\"symbols\":{\"end\":{\"class\":\"end-element\"},\"start\":{\"element-color\":\"green\",\"fill\":\"yellow\",\"font-color\":\"red\"}},\"text-margin\":10,\"x\":0,\"y\":0,\"yes-text\":\"yes\"}");
+
+      var flowchartPrefix = "language-flowchart";
+      var index = 0;
+      Array.prototype.forEach.call(document.querySelectorAll("[class^=" + flowchartPrefix + "]"), function(x){
+          x.style.display = 'none'
+          x.parentNode.style.backgroundColor = "transparent"
+          jsonContent = x.innerText;
+
+          node0 = document.createElement('div');
+          node0.id = 'flowchart' + index;
+          x.parentNode.insertBefore(node0, x);
+
+          var diagram = flowchart.parse(jsonContent);
+          diagram.drawSVG("flowchart"+index, options);
+
+          index +=1;
+      });
+      
+      
+
+    }
+
+    
+    if (lib && lib.includes('mathjax')) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: false,
+          packages: { '[+]': ['noerrors'] }
+        },
+        loader: {
+          load: ['[tex]/noerrors']
+        },
+      };
+    }
+
+    
+    if (lib && lib.includes('msc')) {
+      
+      var options = JSON.parse("{\"theme\":\"hand\"}");    
+
+      var index = 0;
+      var chartPrefix = "language-msc";
+      Array.prototype.forEach.call(document.querySelectorAll("[class^=" + chartPrefix + "]"), function (x) {
+        x.style.display = 'none'
+        x.parentNode.style.backgroundColor = "transparent"
+        jsonContent = x.innerText;
+        node0 = document.createElement('div');
+        node0.id = 'msc' + index;
+        x.parentNode.insertBefore(node0, x);
+        var diagram = Diagram.parse(jsonContent);
+        diagram.drawSVG("msc" + index, options);
+        index += 1;
+      });
+
+      
+
+    }
+
+    
+    if (lib && lib.includes('chart')) {
+      var borderColor = "#666";
+      var bgColor = "#ddd";
+      var borderWidth = 2;
+
+      Chart.defaults.global.elements.rectangle.borderWidth = borderWidth;
+      Chart.defaults.global.elements.rectangle.borderColor = borderColor;
+      Chart.defaults.global.elements.rectangle.backgroundColor = bgColor;
+
+      Chart.defaults.global.elements.line.borderWidth = borderWidth;
+      Chart.defaults.global.elements.line.borderColor = borderColor;
+      Chart.defaults.global.elements.line.backgroundColor = bgColor;
+
+      Chart.defaults.global.elements.point.borderWidth = borderWidth;
+      Chart.defaults.global.elements.point.borderColor = borderColor;
+      Chart.defaults.global.elements.point.backgroundColor = bgColor;
+
+      var chartPrefix = "language-chart";
+      var index = 0;
+      Array.prototype.forEach.call(document.querySelectorAll("[class^=" + chartPrefix + "]"), function (x) {
+        x.style.display = 'none'
+        x.parentNode.style.backgroundColor = "transparent"
+        jsonContent = x.innerText;
+        node0 = document.createElement('canvas');
+        node0.height = 200;
+        node0.style.height = 200;
+        node0.id = 'myChart' + index;
+        source = JSON.parse(jsonContent);
+        x.parentNode.insertBefore(node0, x);
+        var ctx = document.getElementById('myChart' + index).getContext('2d');
+        var myChart = new Chart(ctx, source);
+        index += 1;
+      });      
+
+      
+
+      
+    }
+
+    
+    if (lib && lib.includes('wavedrom')) {
+      
+
+
+      var wavePrefix = "language-wave";
+      var index = 0;
+      Array.prototype.forEach.call(document.querySelectorAll("[class^=" + wavePrefix + "]"), function (x) {
+        x.style.display = 'none'
+        x.parentNode.style.backgroundColor = "transparent"
+        jsonContent = x.innerText;
+        node0 = document.createElement('div');
+        node0.id = 'WaveDrom_Display_' + index;
+        source = JSON.parse(jsonContent);
+        x.parentNode.insertBefore(node0, x);
+        WaveDrom.RenderWaveForm(index, source, "WaveDrom_Display_");
+        index += 1;
+      });
+    }
+
+    
+    if (lib && lib.includes('viz')) {
+      
+
+
+      var vizPrefix = "language-viz-";
+      Array.prototype.forEach.call(document.querySelectorAll("[class^=" + vizPrefix + "]"), function (x) {
+        x.style.display = 'none'
+        x.parentNode.style.backgroundColor = "transparent"
+        var engine;
+        x.getAttribute("class").split(" ").forEach(function (cls) {
+          if (cls.startsWith(vizPrefix)) {
+            engine = cls.substr(vizPrefix.length);
+          }
+        });
+        var viz = new Viz();
+        viz.renderSVGElement(x.innerText, { engine: engine })
+          .then(function (element) {
+            element.style.width = "100%";
+            x.parentNode.insertBefore(element, x);
+          })
+      });
+    }
+  }
+</script>
+
+
+            
+            <footer class="footer">
+    
+<div class="dropdown">
+  <button class="dropdown-trigger" aria-label="Select Theme Button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="currentColor" d="M12.65 15.67c.14-.36.05-.77-.23-1.05l-2.09-2.06.03-.03c1.74-1.94 2.98-4.17 3.71-6.53h1.94c.54 0 .99-.45.99-.99v-.02c0-.54-.45-.99-.99-.99H10V3c0-.55-.45-1-1-1s-1 .45-1 1v1H1.99c-.54 0-.99.45-.99.99 0 .55.45.99.99.99h10.18C11.5 7.92 10.44 9.75 9 11.35c-.81-.89-1.49-1.86-2.06-2.88-.16-.29-.45-.47-.78-.47-.69 0-1.13.75-.79 1.35.63 1.13 1.4 2.21 2.3 3.21L3.3 16.87c-.4.39-.4 1.03 0 1.42.39.39 1.02.39 1.42 0L9 14l2.02 2.02c.51.51 1.38.32 1.63-.35zM17.5 10c-.6 0-1.14.37-1.35.94l-3.67 9.8c-.24.61.22 1.26.87 1.26.39 0 .74-.24.88-.61l.89-2.39h4.75l.9 2.39c.14.36.49.61.88.61.65 0 1.11-.65.88-1.26l-3.67-9.8c-.22-.57-.76-.94-1.36-.94zm-1.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+  </button>
+  <div class="dropdown-content">
+    
+    
+    
+  </div>
+</div>
+
+    
+<div class="footer__social">
+  <div class="social">
+    
+            
+    
+            
+    
+            
+    
+      
+      <a href="https://groups.google.com/forum/#!forum/00share" title="google-plus" aria-label="google-plus">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><path fill="currentColor" d="M 11 7 C 6.027344 7 2 11.027344 2 16 C 2 20.972656 6.027344 25 11 25 C 15.972656 25 20 20.972656 20 16 C 20 15.382813 19.933594 14.78125 19.8125 14.199219 L 19.765625 14 L 11 14 L 11 17 L 17 17 C 16.523438 19.835938 13.972656 22 11 22 C 7.6875 22 5 19.3125 5 16 C 5 12.6875 7.6875 10 11 10 C 12.5 10 13.867188 10.554688 14.921875 11.464844 L 17.070313 9.359375 C 15.46875 7.894531 13.339844 7 11 7 Z M 25 11 L 25 14 L 22 14 L 22 16 L 25 16 L 25 19 L 27 19 L 27 16 L 30 16 L 30 14 L 27 14 L 27 11 Z"/></svg>
+      </a>
+            
+    
+            
+    
+            
+    
+            
+    
+            
+    
+            
+    
+            
+    
+            
+    
+      
+      <a href="https://t.me/dxb22abad" title="telegram" aria-label="telegram">
+        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><path fill="currentColor" d="M 26.070313 3.996094 C 25.734375 4.011719 25.417969 4.109375 25.136719 4.21875 L 25.132813 4.21875 C 24.847656 4.332031 23.492188 4.902344 21.433594 5.765625 C 19.375 6.632813 16.703125 7.757813 14.050781 8.875 C 8.753906 11.105469 3.546875 13.300781 3.546875 13.300781 L 3.609375 13.277344 C 3.609375 13.277344 3.25 13.394531 2.875 13.652344 C 2.683594 13.777344 2.472656 13.949219 2.289063 14.21875 C 2.105469 14.488281 1.957031 14.902344 2.011719 15.328125 C 2.101563 16.050781 2.570313 16.484375 2.90625 16.722656 C 3.246094 16.964844 3.570313 17.078125 3.570313 17.078125 L 3.578125 17.078125 L 8.460938 18.722656 C 8.679688 19.425781 9.949219 23.597656 10.253906 24.558594 C 10.433594 25.132813 10.609375 25.492188 10.828125 25.765625 C 10.933594 25.90625 11.058594 26.023438 11.207031 26.117188 C 11.265625 26.152344 11.328125 26.179688 11.390625 26.203125 C 11.410156 26.214844 11.429688 26.21875 11.453125 26.222656 L 11.402344 26.210938 C 11.417969 26.214844 11.429688 26.226563 11.441406 26.230469 C 11.480469 26.242188 11.507813 26.246094 11.558594 26.253906 C 12.332031 26.488281 12.953125 26.007813 12.953125 26.007813 L 12.988281 25.980469 L 15.871094 23.355469 L 20.703125 27.0625 L 20.8125 27.109375 C 21.820313 27.550781 22.839844 27.304688 23.378906 26.871094 C 23.921875 26.433594 24.132813 25.875 24.132813 25.875 L 24.167969 25.785156 L 27.902344 6.65625 C 28.007813 6.183594 28.035156 5.742188 27.917969 5.3125 C 27.800781 4.882813 27.5 4.480469 27.136719 4.265625 C 26.769531 4.046875 26.40625 3.980469 26.070313 3.996094 Z M 25.96875 6.046875 C 25.964844 6.109375 25.976563 6.101563 25.949219 6.222656 L 25.949219 6.234375 L 22.25 25.164063 C 22.234375 25.191406 22.207031 25.25 22.132813 25.308594 C 22.054688 25.371094 21.992188 25.410156 21.667969 25.28125 L 15.757813 20.75 L 12.1875 24.003906 L 12.9375 19.214844 C 12.9375 19.214844 22.195313 10.585938 22.59375 10.214844 C 22.992188 9.84375 22.859375 9.765625 22.859375 9.765625 C 22.886719 9.3125 22.257813 9.632813 22.257813 9.632813 L 10.082031 17.175781 L 10.078125 17.15625 L 4.242188 15.191406 L 4.242188 15.1875 C 4.238281 15.1875 4.230469 15.183594 4.226563 15.183594 C 4.230469 15.183594 4.257813 15.171875 4.257813 15.171875 L 4.289063 15.15625 L 4.320313 15.144531 C 4.320313 15.144531 9.53125 12.949219 14.828125 10.71875 C 17.480469 9.601563 20.152344 8.476563 22.207031 7.609375 C 24.261719 6.746094 25.78125 6.113281 25.867188 6.078125 C 25.949219 6.046875 25.910156 6.046875 25.96875 6.046875 Z"/></svg>
+      </a>
+            
+    
+            
+    
+            
+    
+            
+    
+    
+  <a href="http://dxz.plus/posts/embyconfig//index.xml" type="application/rss+xml" title="rss" aria-label="RSS Feed Link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><circle fill="currentColor" cx="6.18" cy="17.82" r="2.18"/><path fill="currentColor" d="M5.59 10.23c-.84-.14-1.59.55-1.59 1.4 0 .71.53 1.28 1.23 1.4 2.92.51 5.22 2.82 5.74 5.74.12.7.69 1.23 1.4 1.23.85 0 1.54-.75 1.41-1.59-.68-4.2-3.99-7.51-8.19-8.18zm-.03-5.71C4.73 4.43 4 5.1 4 5.93c0 .73.55 1.33 1.27 1.4 6.01.6 10.79 5.38 11.39 11.39.07.73.67 1.28 1.4 1.28.84 0 1.5-.73 1.42-1.56-.73-7.34-6.57-13.19-13.92-13.92z"/></svg>
+  </a>
+
+  </div>
+</div>
+
+    
+<div id="gtt">
+  <div class="gtt">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M8.12 14.71L12 10.83l3.88 3.88c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L12.7 8.71c-.39-.39-1.02-.39-1.41 0L6.7 13.3c-.39.39-.39 1.02 0 1.41.39.38 1.03.39 1.42 0z"/></svg>
+  </div>
+</div>
+
+    <hr />
+
+    
+    <div class="footer__poweredby">
+    
+
+                
+            <p class="caption">
+                ©2022, All Rights Reserved
+            </p>
+        
+        <p class="caption">Powered by <a href="https://gohugo.io/" rel="noreferrer">Hugo</a> and the <a href="https://github.com/zzossig/hugo-theme-zzo" rel="noreferrer">Zzo theme</a></p>
+    </div>
+        
+</footer>
+        </div>    
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>packege on 学渣的世界</title>
+    <link>http://dxz.plus/tags/packege/</link>
+    <description>Recent content in packege on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Thu, 04 Feb 2021 00:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/tags/packege/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>plex服务器刮削包提供</title>
+        <link>http://dxz.plus/posts/pmspackage/</link>
+        <pubDate>Thu, 04 Feb 2021 00:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/pmspackage/</guid>
+        <description>&lt;p&gt;PMS sharing project - scraperPackege&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>

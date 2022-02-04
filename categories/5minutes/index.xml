@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>5minutes on 学渣的世界</title>
+    <link>http://dxz.plus/categories/5minutes/</link>
+    <description>Recent content in 5minutes on 学渣的世界</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>woqinlaoye@gmail.com (金牌大学渣)</managingEditor>
+    <webMaster>woqinlaoye@gmail.com (金牌大学渣)</webMaster>
+    <copyright>&amp;copy;{year}, All Rights Reserved</copyright>
+    <lastBuildDate>Wed, 02 Feb 2022 20:18:15 +0800</lastBuildDate>
+    
+        <atom:link href="http://dxz.plus/categories/5minutes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+      
+      <item>
+        <title>Autoscan 监控媒体库 by Kolicime</title>
+        <link>http://dxz.plus/posts/autoscanbykolicime/</link>
+        <pubDate>Wed, 02 Feb 2022 20:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autoscanbykolicime/</guid>
+        <description>前面的话 感谢 Kolicime 提供的全部教程 一转眼就2022了，2022注定是不平凡的一年，抗疫新冠，未竟全功，冬奥盛会，不日将至，二十大盛会，启动在即，“</description>
+      </item>
+      
+      <item>
+        <title>GitHub Action 转存 Onedrive Google Drive 6盘</title>
+        <link>http://dxz.plus/posts/githubaction/</link>
+        <pubDate>Thu, 15 Apr 2021 20:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/githubaction/</guid>
+        <description>GithubAction新建workflow 感谢 jiegto 提供的flow 可以在这里获取 为了方便小白如我 直接上图 其中填入如下内容，注意改一下 gclone copy 那里，</description>
+      </item>
+      
+      <item>
+        <title>plex服务器刮削包提供</title>
+        <link>http://dxz.plus/posts/pmspackage/</link>
+        <pubDate>Thu, 04 Feb 2021 00:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/pmspackage/</guid>
+        <description>&lt;p&gt;PMS sharing project - scraperPackege&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>sni gost hosts 分流rclone</title>
+        <link>http://dxz.plus/posts/sni/</link>
+        <pubDate>Sat, 23 Jan 2021 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/sni/</guid>
+        <description>利用gost支持sni协议做简单rclone googleaip 分流 &amp;hellip;&amp;hellip; 在 Terrance Siu (TS)大佬指点下，搞定了sni+gost+白名单 本次折腾的主要意义在于：gost</description>
+      </item>
+      
+      <item>
+        <title>tmm刮削简单说明</title>
+        <link>http://dxz.plus/posts/tmm/</link>
+        <pubDate>Fri, 18 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/tmm/</guid>
+        <description>tmm tinymediamanager 可以用docker版 本地， vps 皆可 docker run -d --name=tmm \ -v /root/disk/tmm/config:/config \ -v /root/rclone:/media \ -e GROUP_ID=0 -e USER_ID=0 -e TZ=Europe/Madrid \ -p 5800:5800 \ -p 5900:5900 \ -e ENABLE_CJK_FONT=1 \ romancin/tinymediamanager:latest 老规矩 gd挂载的媒体库在 /root/rclone ,把她映射进 tmm的 m</description>
+      </item>
+      
+      <item>
+        <title>plex服务器集群 PMS cluster</title>
+        <link>http://dxz.plus/posts/pms/</link>
+        <pubDate>Sat, 12 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/pms/</guid>
+        <description>PMS sharing project &amp;hellip;&amp;hellip; 这个中转真的很麻烦，发出来全当引玉了。。。丢人不怕，能帮到你就好 00盘复兴计划开始了，预计农历上线 主要内容还是和之前00盘类似 提供小</description>
+      </item>
+      
+      <item>
+        <title>gost套娃socks5</title>
+        <link>http://dxz.plus/posts/gost/</link>
+        <pubDate>Sun, 06 Dec 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/gost/</guid>
+        <description>回来真好 &amp;hellip;&amp;hellip; 各位学渣，本渣回来啦 谷歌TD凉了，虽然没凉透，但明显不如过去了，限制很多。没办法，纯是玩儿死的。 毕竟苦BAT久矣的内渣们，见到谷歌</description>
+      </item>
+      
+      <item>
+        <title>snap2html linux 定时推送 github</title>
+        <link>http://dxz.plus/posts/snap2html/</link>
+        <pubDate>Wed, 22 Jan 2020 12:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/snap2html/</guid>
+        <description>&lt;h2 id=&#34;新年好&#34;&gt;新年好&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.rlvision.com/snap2html/about.php&#34;&gt;Snap2Html&lt;/a&gt; 是真的好用，B格高高的&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/alepnm/Snap2HTML&#34;&gt;linux&lt;/a&gt;版本功能基本也都有了，可以部署在小鸡上面自动运行&lt;/p&gt;
+&lt;p&gt;在&lt;a href=&#34;https://t.me/SelfEnough&#34;&gt;茶先生&lt;/a&gt;和&lt;a href=&#34;https://t.me/Pan1n1&#34;&gt;panini&lt;/a&gt;的帮助下，终于实现了标题&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Emby Docker 数据库操作</title>
+        <link>http://dxz.plus/posts/embyconfig/</link>
+        <pubDate>Fri, 20 Dec 2019 22:09:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/embyconfig/</guid>
+        <description>&lt;h1 id=&#34;介绍&#34;&gt;介绍&lt;/h1&gt;
+&lt;p&gt;Docker Emby方便之处不仅仅是容易搭建，连数据库转移也非常容易。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>解决 hugo travis 部署博客 failed and exited with 2 during . 错误</title>
+        <link>http://dxz.plus/posts/travisgo/</link>
+        <pubDate>Fri, 20 Dec 2019 08:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/travisgo/</guid>
+        <description>&lt;h1 id=&#34;案由&#34;&gt;案由&lt;/h1&gt;
+&lt;p&gt;昨天晚上想要更新一下博客，因为发现之前的 &lt;a href=&#34;https://dxz.plus/posts/dockerv2rayssembytrojancdn/&#34;&gt;docker v2ray ss emby CDN 自选 cloudflare 节点 简单教程 + trojan 特洛伊&lt;/a&gt; 可以完全自动化了。
+但是在推送到github的时候，travis控制台出现&lt;code&gt;failed and exited with 2 during .&lt;/code&gt;错误，各种重启，折腾，睡觉，折腾，依然无效
+&lt;img src=&#34;https://share.dxz.plus/BlogContent/Screen%20Shot%202019-12-20%20at%208.42.05%20AM-problm.png&#34; alt=&#34;error&#34;&gt;
+真是难坏小白了&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>善用谷歌查找电子书</title>
+        <link>http://dxz.plus/posts/searchboos/</link>
+        <pubDate>Wed, 11 Dec 2019 13:48:26 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/searchboos/</guid>
+        <description>&lt;p&gt;谷歌是好用的，但是我不会，之前&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Finalspeed 拯救辣鸡</title>
+        <link>http://dxz.plus/posts/finalspeed/</link>
+        <pubDate>Tue, 10 Dec 2019 01:16:08 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/finalspeed/</guid>
+        <description>&lt;p&gt;重启弃用多年的Finalspeed加速，配合软路由，实现小鸡高高飞起&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>docker v2ray ss  emby  CDN 自选 cloudflare 节点 简单教程 &#43; trojan 特洛伊</title>
+        <link>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</link>
+        <pubDate>Sat, 30 Nov 2019 11:18:15 +0800</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/dockerv2rayssembytrojancdn/</guid>
+        <description>&lt;p&gt;参考 &lt;a href=&#34;https://ssu.tw/index.php/archives/31/&#34;&gt;&lt;strong&gt;使用docker快速部署shadowsocks-libev+v2ray-plugin&lt;/strong&gt;&lt;/a&gt; 和 &lt;a href=&#34;https://www.youtube.com/watch?v=8syWEJq8dH4&amp;amp;t=120s&#34;&gt;&lt;strong&gt;V2Ray拒绝减速CDN，自选香港日本CDN节点&lt;/strong&gt;&lt;/a&gt;两位的方法, 结合&lt;a href=&#34;https://teddysun.com/569.html&#34;&gt;秋水&lt;/a&gt;提供的 &lt;a href=&#34;https://hub.docker.com/r/teddysun/shadowsocks-libev/&#34;&gt;ss-libev&lt;/a&gt; 和 &lt;a href=&#34;https://hub.docker.com/r/teddysun/v2ray&#34;&gt;v2ray&lt;/a&gt; 两个 dockers 用起来非常爽，全走CDN，不再阻断，速度尚可。总结一下&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>甲骨文 免费鸡 重装系统 dd debian 9</title>
+        <link>http://dxz.plus/posts/oracle/</link>
+        <pubDate>Mon, 25 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/oracle/</guid>
+        <description>&lt;p&gt;ss最近太难受，而手里的甲骨文免费小鸡，无论如何也安装不上wireguard，系统是 ubuntu 18. 决定dd个debian。但是命令执行不下去，没办法，只好先创建一个收费鸡，系统换到16，然后在dd脚本至debian9&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Autorclone 教程的一些tips及折腾中遇到的错误的解决办法</title>
+        <link>http://dxz.plus/posts/autorclonetips/</link>
+        <pubDate>Fri, 15 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonetips/</guid>
+        <description>&lt;p&gt;用autorclone对于小白的我来说还是挺挑战的，一些基本操作都不会，遇到问题只能靠google，还好多数问题都能找到答案。整理一些使用中的小技巧，和一下自己使用过程中遇到的一些错误以及解决办法，让更多小白更顺畅的折腾。保持更新 UPDATING&amp;hellip;&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 手动加 SA 到 Group 5分钟 5minuts</title>
+        <link>http://dxz.plus/posts/autorclonesagroup/</link>
+        <pubDate>Sun, 10 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesagroup/</guid>
+        <description>&lt;p&gt;手动添加 SA 到 group 非常简单,就是比较耗时,因为每天只能添加100个 SA 到group 。因为只需要添加一个用户 (admin) 即可操作 autorclone，实现更高效的操作（折腾） gdrive 互拷。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>AutoRclone 教程 Tutorial 利用Group添加SA，5分钟搞定 gdrive转存 Adding Service Accounts (SA) to a Googlegroup</title>
+        <link>http://dxz.plus/posts/autorclonesa5minutes/</link>
+        <pubDate>Sat, 09 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/autorclonesa5minutes/</guid>
+        <description>&lt;h2 id=&#34;嘚哔嘚&#34;&gt;嘚哔嘚&lt;/h2&gt;
+&lt;p&gt;为了让小白真正实现5分钟学会用好autorclone转移Gdrive资源，我真是不遗余力。。。
+经过Autorclone和Panini两位大佬指导，学会了用Group添加SA，虽然是手动的，比较费事，但是弄好以后一劳永逸。我提供的SA账号里面预计会加入900个SA。届时你只需要将这个GROUP地址&lt;code&gt;dxzdxz@googlegroups.com&lt;/code&gt;加入（源）目标TD文件夹（管理员身份）即可。&lt;/p&gt;
+&lt;p&gt;To use autorclone is pretty easy when you get the googlegroup all set. To facilitate that, here we have a finished group, which you can use to test the water. Just add &lt;code&gt;dxzdxz@googlegroups.com&lt;/code&gt; to your teamdrive(TD) or googledrive(GD) as a manager, and that&amp;rsquo;s all&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Host大法，实现Gdrive直连</title>
+        <link>http://dxz.plus/posts/host/</link>
+        <pubDate>Fri, 08 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/host/</guid>
+        <description>&lt;p&gt;结合Gdrive edu版 实现 无限流量 无限速 直连&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>5分钟-15G普通Gdrive账号变身无限制用不翻车账号</title>
+        <link>http://dxz.plus/posts/gdrive15g/</link>
+        <pubDate>Wed, 06 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/gdrive15g/</guid>
+        <description>&lt;p&gt;最近gdrive有很多骚操作，玩了一段时间，做个记录吧。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>rclone 一条命令备份docker搭建的typecho wordpress数据</title>
+        <link>http://dxz.plus/posts/backuptypecho/</link>
+        <pubDate>Tue, 05 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/backuptypecho/</guid>
+        <description>&lt;h2 id=&#34;废话&#34;&gt;废话&lt;/h2&gt;
+&lt;p&gt;typecho没有wordpress那么多插件，自动上传数据库啥的，但是wordpress想备份到gdrive，都要加钱买专业版。但在docker这，你不用花钱。
+下面只示例typecho，wordpress同理。&lt;/p&gt;</description>
+      </item>
+      
+      <item>
+        <title>Test-图片外链是否可以用workers的</title>
+        <link>http://dxz.plus/posts/testurl/</link>
+        <pubDate>Mon, 04 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/testurl/</guid>
+        <description>&lt;p&gt;试试看看图片外链是否可以用workers的 那样就省本地空间了&lt;/p&gt;
+&lt;h2 id=&#34;测试&#34;&gt;测试&lt;/h2&gt;</description>
+      </item>
+      
+      <item>
+        <title>VPS 5分钟极速搭建emby服务</title>
+        <link>http://dxz.plus/posts/emby/</link>
+        <pubDate>Sun, 03 Nov 2019 20:29:50 +0000</pubDate>
+        <author>woqinlaoye@gmail.com (金牌大学渣)</author>
+        <guid>http://dxz.plus/posts/emby/</guid>
+        <description>&lt;p&gt;免费的虽然是最贵的，但是性价比却无可争议的+∞&lt;/p&gt;
+&lt;h2 id=&#34;废话一堆&#34;&gt;废话一堆&lt;/h2&gt;
+&lt;p&gt;写这个教程是主要是为了测试docker搭建typecho，由于docker映射文件夹简直太方便了，所有网站数据分分钟打包，备份，搬家。适合我这样的瞎折腾。
+更主要的，我们手里有n多垃圾小鸡，除了探针，网盘目录外还有别的骚法么？
+这篇文章带你骚。
+基本上你的小鸡速度够快，尤其是晚上，比如北方联通用justhost，甲骨文之类的都可以非常爽快的试用这个方法。
+由于是本地kodi解码，串流播放，服务器没啥压力，配置不需要多高，同时也没必要买emby专业版了，我的plex算是白买了，nas我还特意买的J3455服务端解码，看来也是浪费。
+虽然读取的是gdrive电影，但是由于是vps搭建，host大法基本用不到了。并且这个emby个人服务应该不会触及红线，系统占用低，不用担心被各种ban(GFW&amp;amp;VPS providers)
+5分钟也就是个标题，看看就好，熟练了也就10分钟以内就搞定。我一连气儿搭了3个服务，太爽了，不分享出来是不行的，憋着难受&lt;/p&gt;</description>
+      </item>
+      
+    
+  </channel>
+</rss>
